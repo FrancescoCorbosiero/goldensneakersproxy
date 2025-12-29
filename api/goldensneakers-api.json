@@ -1,0 +1,1177 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Golden Sneakers API",
+    "description": "Welcome to the Golden Sneakers API documentation.\n\nTo use this API, you need to authenticate with a Bearer token.\n\nPlease contact the system administrator to generate a token for you.\nOnce you have the token, include it in the `Authorization` header with the prefix `Bearer `.\n\nExample:\n```\nAuthorization: Bearer your_token_here\n```\n",
+    "termsOfService": "/static/assets/pdf/terms/api_usage_policy.pdf",
+    "contact": {
+      "email": "it@goldensneakers.net"
+    },
+    "extensions": {
+      "x-samples-enabled": true,
+      "x-samples-languages": [
+        "curl",
+        "python",
+        "javascript",
+        "node"
+      ]
+    },
+    "version": "v1"
+  },
+  "host": "www.goldensneakers.net",
+  "schemes": [
+    "https"
+  ],
+  "basePath": "/api",
+  "consumes": [
+    "application/json",
+    "application/xml"
+  ],
+  "produces": [
+    "application/json",
+    "application/xml"
+  ],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Enter your token with \"Bearer \" prefix"
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ],
+  "paths": {
+    "/assortment-flat/": {
+      "get": {
+        "operationId": "assortment-flat_list",
+        "summary": "Retrieve flat list of all available sizes as individual products",
+        "description": "Retrieve a flat list of all available sizes as individual products. Each size variant is returned as a separate item, similar to a product feed. Use `markup_percentage` to add a percentage increase, `markup_fixed` to add a fixed amount, and `vat_percentage` to apply VAT to the offer price. Rounding options allow adjustment of the presented price. For Exposly users, an automatic 3% discount is applied to all prices.",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "A search term.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "ordering",
+            "in": "query",
+            "description": "Which field to use when ordering the results.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "markup_percentage",
+            "in": "query",
+            "description": "Optional percentage markup to add to the offer price.",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "markup_fixed",
+            "in": "query",
+            "description": "Optional fixed amount to add to the offer price.",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "vat_percentage",
+            "in": "query",
+            "description": "Optional VAT percentage to apply to the offer price.",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "rounding_type",
+            "in": "query",
+            "description": "Optional rounding type for the presented price. Options are:\\n- `none`: No rounding (default).\\n- `whole`: Round to the nearest whole number.\\n- `half`: Round to the nearest 0.5.\\n- `point_nine_nine`: Adjust the integer part to the nearest multiple of 10 ending in 9, then add 0.99 (e.g., 43.20 becomes 49.99).",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "none",
+              "whole",
+              "half",
+              "point_nine_nine"
+            ],
+            "default": "none"
+          },
+          {
+            "name": "show_only_products_with_ean",
+            "in": "query",
+            "description": "If `true`, show only sizes with `barcode` (EAN).",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/FlatSize"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        },
+        "tags": [
+          "assortment"
+        ]
+      },
+      "parameters": []
+    },
+    "/assortment-flat/{id}/": {
+      "get": {
+        "operationId": "assortment-flat_read",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/FlatSize"
+            }
+          }
+        },
+        "tags": [
+          "assortment-flat"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/assortment-size/": {
+      "get": {
+        "operationId": "assortment-size_list",
+        "summary": "Retrieve product information by size ID or barcode",
+        "description": "This endpoint retrieves detailed information about a product, including its assortment sizes, by providing either a size ID or a barcode. Optional parameters can adjust the presented price with markups, VAT, and rounding.",
+        "parameters": [
+          {
+            "name": "barcode",
+            "in": "query",
+            "description": "Barcode of the assortment size",
+            "type": "string"
+          },
+          {
+            "name": "size_id",
+            "in": "query",
+            "description": "ID of the assortment size",
+            "type": "integer"
+          },
+          {
+            "name": "markup_percentage",
+            "in": "query",
+            "description": "Optional percentage markup to add to the offer price.",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "markup_fixed",
+            "in": "query",
+            "description": "Optional fixed amount to add to the offer price.",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "vat_percentage",
+            "in": "query",
+            "description": "Optional VAT percentage to apply to the offer price.",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "rounding_type",
+            "in": "query",
+            "description": "Optional rounding type for the presented price. Options are:\n- `none`: No rounding (default).\n- `whole`: Round to the nearest whole number.\n- `half`: Round to the nearest 0.5.\n- `point_nine_nine`: Adjust the integer part to the nearest multiple of 10 ending in 9, then add 0.99 (e.g., 43.20 becomes 49.99).",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "none",
+              "whole",
+              "half",
+              "point_nine_nine"
+            ],
+            "default": "none"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/AssortmentWithSize"
+            }
+          }
+        },
+        "tags": [
+          "assortment"
+        ]
+      },
+      "parameters": []
+    },
+    "/assortment/": {
+      "get": {
+        "operationId": "assortment_list",
+        "summary": "Retrieve list of all products with available sizes.",
+        "description": "Retrieve a list of assortments with optional price adjustments. Use `markup_percentage` to add a percentage increase, `markup_fixed` to add a fixed amount, and `vat_percentage` to apply VAT to the offer price.Rounding options allow adjustment of the presented price.",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "A search term.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "ordering",
+            "in": "query",
+            "description": "Which field to use when ordering the results.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "markup_percentage",
+            "in": "query",
+            "description": "Optional percentage markup to add to the offer price.",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "markup_fixed",
+            "in": "query",
+            "description": "Optional fixed amount to add to the offer price.",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "vat_percentage",
+            "in": "query",
+            "description": "Optional VAT percentage to apply to the offer price.",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "rounding_type",
+            "in": "query",
+            "description": "Optional rounding type for the presented price. Options are:\n- `none`: No rounding (default).\n- `whole`: Round to the nearest whole number.\n- `half`: Round to the nearest 0.5.\n- `point_nine_nine`: Adjust the integer part to the nearest multiple of 10 ending in 9, then add 0.99 (e.g., 43.20 becomes 49.99).",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "none",
+              "whole",
+              "half",
+              "point_nine_nine"
+            ],
+            "default": "none"
+          },
+          {
+            "name": "show_only_products_with_ean",
+            "in": "query",
+            "description": "If `true`, show only sizes with `barcode` (EAN).",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Assortment"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        },
+        "tags": [
+          "assortment"
+        ]
+      },
+      "parameters": []
+    },
+    "/assortment/{id}/": {
+      "get": {
+        "operationId": "assortment_read",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Assortment"
+            }
+          }
+        },
+        "tags": [
+          "assortment"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "A unique integer value identifying this assortment.",
+          "required": true,
+          "type": "integer"
+        }
+      ]
+    },
+    "/orders-dropship/create-order/": {
+      "post": {
+        "operationId": "orders-dropship_create-order_create",
+        "summary": "Create a dropship order",
+        "description": "Creates a dropship order with delivery address.\n\n**Item identification options:**\n- Use `size_id` for direct size identification\n- Use `sku` + `size_us` for product SKU + US size identification\n\n**Important:** For each item, use either `size_id` OR (`sku` + `size_us`), not both.\n\n**Shipping label options:**\n- Set `client_provides_shipping_label` to `true` if client will provide their own shipping label\n- Set `client_provides_shipping_label` to `false` (default) if Golden Sneakers should generate the shipping label",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "required": [
+                "delivery_address",
+                "items"
+              ],
+              "type": "object",
+              "properties": {
+                "delivery_address": {
+                  "required": [
+                    "name",
+                    "city",
+                    "zip_code",
+                    "street",
+                    "country_code",
+                    "phone",
+                    "email"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "description": "Recipient name",
+                      "type": "string"
+                    },
+                    "city": {
+                      "description": "City",
+                      "type": "string"
+                    },
+                    "zip_code": {
+                      "description": "Zip code",
+                      "type": "string"
+                    },
+                    "street": {
+                      "description": "Street",
+                      "type": "string"
+                    },
+                    "country_code": {
+                      "description": "Country code (e.g. IT, PL, DE)",
+                      "type": "string"
+                    },
+                    "phone": {
+                      "description": "Phone number",
+                      "type": "string"
+                    },
+                    "email": {
+                      "description": "Email address",
+                      "type": "string"
+                    }
+                  }
+                },
+                "client_provides_shipping_label": {
+                  "description": "True if client will provide their own shipping label, False if we should generate one",
+                  "type": "boolean",
+                  "default": false
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "required": [
+                      "quantity"
+                    ],
+                    "type": "object",
+                    "properties": {
+                      "size_id": {
+                        "description": "Size ID (use this OR sku+size_us)",
+                        "type": "integer"
+                      },
+                      "sku": {
+                        "description": "Product SKU (use with size_us)",
+                        "type": "string"
+                      },
+                      "size_us": {
+                        "description": "Size US (use with sku)",
+                        "type": "string"
+                      },
+                      "quantity": {
+                        "description": "Quantity to order",
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "delivery_address": {
+                  "name": "Mario Rossi",
+                  "city": "Milano",
+                  "zip_code": "20121",
+                  "street": "Via Montenapoleone 12",
+                  "country_code": "IT",
+                  "phone": "+393401234567",
+                  "email": "mario.rossi@example.it"
+                },
+                "client_provides_shipping_label": false,
+                "items": [
+                  {
+                    "size_id": 123,
+                    "quantity": 2
+                  },
+                  {
+                    "sku": "AIR-JORDAN-1-HIGH",
+                    "size_us": "9.5",
+                    "quantity": 1
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Dropship order created successfully",
+            "examples": {
+              "application/json": {
+                "message": "Dropship order created successfully",
+                "order_id": 123,
+                "total_price": 299.99,
+                "dropship_package_id": 456
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "examples": {
+              "application/json": {
+                "error": "Validation failed"
+              }
+            }
+          }
+        },
+        "tags": [
+          "orders-dropship"
+        ]
+      },
+      "parameters": []
+    },
+    "/orders-dropship/order-details/{order_id}/": {
+      "get": {
+        "operationId": "orders-dropship_order-details_read",
+        "summary": "Get dropship order details",
+        "description": "Retrieves details of a specific dropship order. Only the order owner can access the details.\n\n**Possible order statuses:**\n- `UNCONFIRMED`: Order created but not yet confirmed\n- `TO_SHIP`: Order confirmed and ready to ship\n- `ENDED`: Order completed and delivered\n- `CANCELED`: Order canceled\n- `WAITING_FOR_INVOICE`: Order waiting for invoice processing",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "description": "ID of the order to retrieve",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order details retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "order_id": {
+                  "description": "Order ID",
+                  "type": "integer"
+                },
+                "status": {
+                  "description": "Order status. Possible values: UNCONFIRMED (Order created but not yet confirmed), TO_SHIP (Order confirmed and ready to ship), ENDED (Order completed and delivered), CANCELED (Order canceled), WAITING_FOR_INVOICE (Order waiting for invoice processing)",
+                  "type": "string",
+                  "enum": [
+                    "UNCONFIRMED",
+                    "TO_SHIP",
+                    "ENDED",
+                    "CANCELED",
+                    "WAITING_FOR_INVOICE"
+                  ]
+                },
+                "total_amount": {
+                  "description": "Total order amount",
+                  "type": "number",
+                  "format": "decimal"
+                },
+                "currency": {
+                  "description": "Currency code",
+                  "type": "string"
+                },
+                "created_at": {
+                  "description": "Order creation date",
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "dropship_package_id": {
+                  "description": "Dropship package ID",
+                  "type": "integer",
+                  "x-nullable": true
+                },
+                "tracking_numbers": {
+                  "description": "List of tracking numbers for all packages in this order. Note: tracking numbers may not be available immediately - they are generated after our staff creates the shipment.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "size_id": {
+                        "description": "Size ID",
+                        "type": "integer"
+                      },
+                      "sku": {
+                        "description": "Product SKU",
+                        "type": "string"
+                      },
+                      "size_us": {
+                        "description": "Size US",
+                        "type": "string"
+                      },
+                      "product_name": {
+                        "description": "Product name",
+                        "type": "string"
+                      },
+                      "quantity": {
+                        "description": "Quantity ordered",
+                        "type": "integer"
+                      },
+                      "unit_price": {
+                        "description": "Unit price",
+                        "type": "number",
+                        "format": "decimal"
+                      },
+                      "total_price": {
+                        "description": "Total price for this item",
+                        "type": "number",
+                        "format": "decimal"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "order_id": 123,
+                "status": "TO_SHIP",
+                "total_amount": 299.99,
+                "currency": "EUR",
+                "created_at": "2024-01-15T10:30:00Z",
+                "dropship_package_id": 456,
+                "tracking_numbers": [
+                  "1234567890123",
+                  "1234567890124"
+                ],
+                "items": [
+                  {
+                    "size_id": 789,
+                    "sku": "AIR-JORDAN-1-HIGH",
+                    "size_us": "9.5",
+                    "product_name": "Air Jordan 1 High",
+                    "quantity": 1,
+                    "unit_price": 149.99,
+                    "total_price": 149.99
+                  },
+                  {
+                    "size_id": 790,
+                    "sku": "NIKE-DUNK-LOW",
+                    "size_us": "10",
+                    "product_name": "Nike Dunk Low",
+                    "quantity": 1,
+                    "unit_price": 150,
+                    "total_price": 150
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "examples": {
+              "application/json": {
+                "error": "Client profile not found"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - not order owner",
+            "examples": {
+              "application/json": {
+                "error": "You don't have permission to view this order"
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "examples": {
+              "application/json": {
+                "error": "Order not found"
+              }
+            }
+          }
+        },
+        "tags": [
+          "orders-dropship"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "order_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/orders-dropship/package-details/{package_id}/": {
+      "get": {
+        "operationId": "orders-dropship_package-details_read",
+        "summary": "Get dropship package details",
+        "description": "Retrieves details of a specific dropship package. Only the package owner can access the details.\n\n**Possible package statuses:**\n- `PENDING`: Package created and pending processing\n- `READY_FOR_PROFORMA`: Package ready for proforma invoice generation\n- `WAITING_FOR_INVOICE`: Package waiting for final invoice\n- `ENDED`: Package processing completed",
+        "parameters": [
+          {
+            "name": "package_id",
+            "in": "path",
+            "description": "ID of the dropship package to retrieve",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dropship package details retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "package_id": {
+                  "description": "Package ID",
+                  "type": "integer"
+                },
+                "status": {
+                  "description": "Package status. Possible values: PENDING (Package created and pending processing), READY_FOR_PROFORMA (Package ready for proforma invoice generation), WAITING_FOR_INVOICE (Package waiting for final invoice), ENDED (Package processing completed)",
+                  "type": "string",
+                  "enum": [
+                    "PENDING",
+                    "READY_FOR_PROFORMA",
+                    "WAITING_FOR_INVOICE",
+                    "ENDED"
+                  ]
+                },
+                "creation_date": {
+                  "description": "Package creation date",
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "last_update_date": {
+                  "description": "Last update date",
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "total_order_count": {
+                  "description": "Total number of orders in package",
+                  "type": "integer"
+                },
+                "total_order_price": {
+                  "description": "Total price of all orders in package",
+                  "type": "number",
+                  "format": "decimal"
+                },
+                "orders": {
+                  "description": "List of orders in this package",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "order_id": {
+                        "description": "Order ID",
+                        "type": "integer"
+                      },
+                      "status": {
+                        "description": "Order status",
+                        "type": "string"
+                      },
+                      "created_at": {
+                        "description": "Order creation date",
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "total_price": {
+                        "description": "Order total price",
+                        "type": "number",
+                        "format": "decimal"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "package_id": 456,
+                "status": "READY_FOR_PROFORMA",
+                "creation_date": "2024-01-15T09:00:00Z",
+                "last_update_date": "2024-01-15T12:30:00Z",
+                "total_order_count": 3,
+                "total_order_price": 599.97,
+                "orders": [
+                  {
+                    "order_id": 123,
+                    "status": "TO_SHIP",
+                    "created_at": "2024-01-15T10:30:00Z",
+                    "total_price": 299.99
+                  },
+                  {
+                    "order_id": 124,
+                    "status": "TO_SHIP",
+                    "created_at": "2024-01-15T11:00:00Z",
+                    "total_price": 199.99
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "examples": {
+              "application/json": {
+                "error": "Client profile not found"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - not package owner",
+            "examples": {
+              "application/json": {
+                "error": "You don't have permission to view this package"
+              }
+            }
+          },
+          "404": {
+            "description": "Package not found",
+            "examples": {
+              "application/json": {
+                "error": "Package not found"
+              }
+            }
+          }
+        },
+        "tags": [
+          "orders-dropship"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "package_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/orders-dropship/upload-shipping-label/{order_id}/": {
+      "post": {
+        "operationId": "orders-dropship_upload-shipping-label_create",
+        "summary": "Upload shipping label and tracking numbers",
+        "description": "Uploads a shipping label file and tracking numbers for a dropship order.\n\n**Requirements:**\n- Order must be a dropship order (`is_dropship=True`)\n- Order must have `client_provides_shipping_label=True`\n- Order must not have any shipping labels already uploaded\n- Only the order owner can upload shipping labels\n\n**Request format:**\n- Content-Type: `multipart/form-data`\n- Include shipping label file and tracking numbers as JSON array",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "description": "ID of the order to upload shipping label for",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "shipping_label",
+            "in": "formData",
+            "description": "Shipping label file (PDF, JPG, PNG)",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "tracking_numbers",
+            "in": "formData",
+            "description": "JSON array of tracking numbers (e.g., [\"1234567890\", \"0987654321\"])",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Shipping label uploaded successfully",
+            "examples": {
+              "application/json": {
+                "message": "Shipping label uploaded successfully",
+                "order_id": 123,
+                "file_id": 456,
+                "tracking_numbers": [
+                  "1234567890",
+                  "0987654321"
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - validation error",
+            "examples": {
+              "application/json": {
+                "error": "Order already has shipping labels uploaded"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - not order owner or wrong order type",
+            "examples": {
+              "application/json": {
+                "error": "You don't have permission to upload shipping label for this order"
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "examples": {
+              "application/json": {
+                "error": "Order not found"
+              }
+            }
+          }
+        },
+        "consumes": [
+          "multipart/form-data",
+          "application/x-www-form-urlencoded"
+        ],
+        "tags": [
+          "orders-dropship"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "order_id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/sku-search/": {
+      "get": {
+        "operationId": "sku-search_list",
+        "description": "Search products by SKU or name for autocomplete",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search query (minimum 3 characters)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of results to return (default: 10)",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of matching products",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "brand": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - query too short"
+          }
+        },
+        "tags": [
+          "sku-search"
+        ]
+      },
+      "parameters": []
+    }
+  },
+  "definitions": {
+    "FlatSize": {
+      "required": [
+        "sku",
+        "product_name",
+        "brand_name",
+        "size_mapper_name",
+        "size_us"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "sku": {
+          "title": "Sku",
+          "type": "string",
+          "minLength": 1
+        },
+        "product_name": {
+          "title": "Product name",
+          "type": "string",
+          "minLength": 1
+        },
+        "brand_name": {
+          "title": "Brand name",
+          "type": "string",
+          "minLength": 1
+        },
+        "size_mapper_name": {
+          "title": "Size mapper name",
+          "type": "string",
+          "minLength": 1
+        },
+        "barcode": {
+          "title": "Barcode",
+          "type": "string",
+          "maxLength": 40,
+          "x-nullable": true
+        },
+        "size_us": {
+          "title": "Size us",
+          "type": "string",
+          "minLength": 1
+        },
+        "size_eu": {
+          "title": "Size eu",
+          "type": "string",
+          "maxLength": 20,
+          "x-nullable": true
+        },
+        "offer_price": {
+          "title": "Offer price",
+          "type": "string",
+          "readOnly": true
+        },
+        "presented_price": {
+          "title": "Presented price",
+          "type": "string",
+          "readOnly": true
+        },
+        "available_quantity": {
+          "title": "Available quantity",
+          "type": "string",
+          "readOnly": true
+        },
+        "image": {
+          "title": "Image",
+          "type": "string",
+          "readOnly": true
+        },
+        "image_full_url": {
+          "title": "Image full url",
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "Size": {
+      "required": [
+        "size_us"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "barcode": {
+          "title": "Barcode",
+          "type": "string",
+          "maxLength": 40,
+          "x-nullable": true
+        },
+        "size_us": {
+          "title": "Size us",
+          "type": "string",
+          "minLength": 1
+        },
+        "size_eu": {
+          "title": "Size eu",
+          "type": "string",
+          "maxLength": 20,
+          "x-nullable": true
+        },
+        "offer_price": {
+          "title": "Offer price",
+          "type": "number"
+        },
+        "presented_price": {
+          "title": "Presented price",
+          "type": "string",
+          "readOnly": true
+        },
+        "available_quantity": {
+          "title": "Available quantity",
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "AssortmentWithSize": {
+      "required": [
+        "sku",
+        "sizes"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "sku": {
+          "title": "Sku",
+          "type": "string",
+          "maxLength": 90,
+          "minLength": 1
+        },
+        "name": {
+          "title": "Name",
+          "type": "string",
+          "maxLength": 150,
+          "minLength": 1,
+          "x-nullable": true
+        },
+        "brand_name": {
+          "title": "Brand name",
+          "type": "string",
+          "readOnly": true,
+          "minLength": 1
+        },
+        "image": {
+          "title": "Image",
+          "type": "string",
+          "readOnly": true
+        },
+        "size_mapper_name": {
+          "title": "Size mapper name",
+          "type": "string",
+          "maxLength": 60,
+          "x-nullable": true
+        },
+        "available_summary_quantity": {
+          "title": "Available summary quantity",
+          "type": "string",
+          "readOnly": true
+        },
+        "sizes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Size"
+          }
+        }
+      }
+    },
+    "Assortment": {
+      "required": [
+        "sku"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "sku": {
+          "title": "Sku",
+          "type": "string",
+          "maxLength": 90,
+          "minLength": 1
+        },
+        "name": {
+          "title": "Name",
+          "type": "string",
+          "maxLength": 150,
+          "minLength": 1,
+          "x-nullable": true
+        },
+        "brand_name": {
+          "title": "Brand name",
+          "type": "string",
+          "readOnly": true,
+          "minLength": 1
+        },
+        "image": {
+          "title": "Image",
+          "type": "string",
+          "readOnly": true
+        },
+        "image_full_url": {
+          "title": "Image full url",
+          "type": "string",
+          "readOnly": true
+        },
+        "size_mapper_name": {
+          "title": "Size mapper name",
+          "type": "string",
+          "maxLength": 60,
+          "x-nullable": true
+        },
+        "available_summary_quantity": {
+          "title": "Available summary quantity",
+          "type": "integer",
+          "readOnly": true
+        },
+        "sizes": {
+          "title": "Sizes",
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    }
+  }
+}
