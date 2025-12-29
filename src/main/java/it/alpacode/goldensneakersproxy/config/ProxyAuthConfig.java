@@ -1,9 +1,7 @@
 package it.alpacode.goldensneakersproxy.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
 @ConfigurationProperties(prefix = "proxy.auth")
 public class ProxyAuthConfig {
 
