@@ -5,15 +5,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "goldensneakers")
 public class GoldenSneakersConfig {
 
-    private String apiUrl;
+    private String baseUrl;
     private String jwtToken;
 
-    public String getApiUrl() {
-        return apiUrl;
+    public String getBaseUrl() {
+        return baseUrl;
     }
 
-    public void setApiUrl(String apiUrl) {
-        this.apiUrl = apiUrl;
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     public String getJwtToken() {
