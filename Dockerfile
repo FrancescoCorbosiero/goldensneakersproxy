@@ -1,44 +1,22 @@
-# Multi-stage build for Spring Boot application
+# Build
+FROM maven:3.9-eclipse-temurin-17-alpine AS builder
+WORKDIR /build
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+COPY src ./src
+RUN mvn clean package -DskipTests -B
 
-# Stage 1: Build
-FROM eclipse-temurin:17-jdk-alpine AS builder
-
-WORKDIR /app
-
-# Copy Maven wrapper and pom.xml
-COPY mvnw pom.xml ./
-COPY .mvn .mvn
-
-# Download dependencies (cached layer)
-RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
-
-# Copy source code
-COPY src src
-
-# Build the application
-RUN ./mvnw clean package -DskipTests -B
-
-# Stage 2: Runtime
+# Run
 FROM eclipse-temurin:17-jre-alpine
-
-WORKDIR /app
-
-# Create non-root user for security
-RUN addgroup -g 1001 -S appgroup && \
+RUN apk add --no-cache curl tzdata && \
+    cp /usr/share/zoneinfo/Europe/Rome /etc/localtime && \
+    addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup
-
-# Copy JAR from builder stage
-COPY --from=builder /app/target/*.jar app.jar
-
-# Change ownership
-RUN chown -R appuser:appgroup /app
-
+WORKDIR /app
+COPY --from=builder /build/target/*.jar app.jar
+RUN chown appuser:appgroup app.jar
 USER appuser
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD wget -q --spider http://localhost:8080/actuator/health || exit 1
-
 EXPOSE 8080
-
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/actuator/health || exit 1
 ENTRYPOINT ["java", "-jar", "app.jar"]
