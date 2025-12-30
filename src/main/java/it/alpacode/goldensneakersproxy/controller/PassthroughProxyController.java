@@ -1,6 +1,6 @@
 package it.alpacode.goldensneakersproxy.controller;
 
-import it.alpacode.goldensneakersproxy.service.GoldenSneakersService;
+import it.alpacode.goldensneakersproxy.service.GoldenSneakersClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -14,31 +14,31 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Main API Controller with business logic applied (price markup, etc.)
- * Uses GoldenSneakersService for data manipulation.
+ * Pure Passthrough Proxy Controller - 1:1 mapping to Golden Sneakers API.
+ * No business logic, no price manipulation. Direct proxy to upstream API.
  */
 @RestController
-@RequestMapping("/api")
-public class ProxyController {
+@RequestMapping("/proxy")
+public class PassthroughProxyController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProxyController.class);
+    private static final Logger logger = LoggerFactory.getLogger(PassthroughProxyController.class);
 
-    private final GoldenSneakersService service;
+    private final GoldenSneakersClient client;
 
-    public ProxyController(GoldenSneakersService service) {
-        this.service = service;
+    public PassthroughProxyController(GoldenSneakersClient client) {
+        this.client = client;
     }
 
-    // ========== Assortment Endpoints (with markup) ==========
+    // ========== Assortment Endpoints (passthrough) ==========
 
     /**
-     * GET /api/assortment - List all products with available sizes (with price markup)
+     * GET /proxy/assortment - List all products (passthrough)
      */
     @GetMapping(value = "/assortment", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getAssortment(@RequestParam Map<String, String> queryParams) {
-        logger.info("Received request to /api/assortment with params: {}", queryParams);
+        logger.info("Received passthrough request to /proxy/assortment with params: {}", queryParams);
 
-        String response = service.getAssortment(queryParams).block();
+        String response = client.fetchAssortment(queryParams).block();
 
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -46,31 +46,31 @@ public class ProxyController {
     }
 
     /**
-     * GET /api/assortment/{id} - Get a specific assortment by ID (with price markup)
+     * GET /proxy/assortment/{id} - Get a specific assortment by ID (passthrough)
      */
     @GetMapping(value = "/assortment/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getAssortmentById(
             @PathVariable String id,
             @RequestParam Map<String, String> queryParams) {
-        logger.info("Received request to /api/assortment/{} with params: {}", id, queryParams);
+        logger.info("Received passthrough request to /proxy/assortment/{} with params: {}", id, queryParams);
 
-        String response = service.getAssortmentById(id, queryParams).block();
+        String response = client.fetchAssortmentById(id, queryParams).block();
 
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(response);
     }
 
-    // ========== Assortment Flat Endpoints (with markup) ==========
+    // ========== Assortment Flat Endpoints (passthrough) ==========
 
     /**
-     * GET /api/assortment-flat - List all sizes as individual products (with price markup)
+     * GET /proxy/assortment-flat - List all sizes as individual products (passthrough)
      */
     @GetMapping(value = "/assortment-flat", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getAssortmentFlat(@RequestParam Map<String, String> queryParams) {
-        logger.info("Received request to /api/assortment-flat with params: {}", queryParams);
+        logger.info("Received passthrough request to /proxy/assortment-flat with params: {}", queryParams);
 
-        String response = service.getAssortmentFlat(queryParams).block();
+        String response = client.fetchAssortmentFlat(queryParams).block();
 
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -78,65 +78,65 @@ public class ProxyController {
     }
 
     /**
-     * GET /api/assortment-flat/{id} - Get a specific flat size by ID (with price markup)
+     * GET /proxy/assortment-flat/{id} - Get a specific flat size by ID (passthrough)
      */
     @GetMapping(value = "/assortment-flat/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getAssortmentFlatById(
             @PathVariable String id,
             @RequestParam Map<String, String> queryParams) {
-        logger.info("Received request to /api/assortment-flat/{} with params: {}", id, queryParams);
+        logger.info("Received passthrough request to /proxy/assortment-flat/{} with params: {}", id, queryParams);
 
-        String response = service.getAssortmentFlatById(id, queryParams).block();
+        String response = client.fetchAssortmentFlatById(id, queryParams).block();
 
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(response);
     }
 
-    // ========== Assortment Size Endpoint (with markup) ==========
+    // ========== Assortment Size Endpoint (passthrough) ==========
 
     /**
-     * GET /api/assortment-size - Retrieve product info by size ID or barcode (with price markup)
+     * GET /proxy/assortment-size - Retrieve product info by size ID or barcode (passthrough)
      */
     @GetMapping(value = "/assortment-size", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getAssortmentSize(@RequestParam Map<String, String> queryParams) {
-        logger.info("Received request to /api/assortment-size with params: {}", queryParams);
+        logger.info("Received passthrough request to /proxy/assortment-size with params: {}", queryParams);
 
-        String response = service.getAssortmentSize(queryParams).block();
+        String response = client.fetchAssortmentSize(queryParams).block();
 
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(response);
     }
 
-    // ========== SKU Search Endpoint ==========
+    // ========== SKU Search Endpoint (passthrough) ==========
 
     /**
-     * GET /api/sku-search - Search products by SKU or name
+     * GET /proxy/sku-search - Search products by SKU or name (passthrough)
      */
     @GetMapping(value = "/sku-search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> searchSku(@RequestParam Map<String, String> queryParams) {
-        logger.info("Received request to /api/sku-search with params: {}", queryParams);
+        logger.info("Received passthrough request to /proxy/sku-search with params: {}", queryParams);
 
-        String response = service.searchSku(queryParams).block();
+        String response = client.searchSku(queryParams).block();
 
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(response);
     }
 
-    // ========== Orders Dropship Endpoints ==========
+    // ========== Orders Dropship Endpoints (passthrough) ==========
 
     /**
-     * POST /api/orders-dropship/create-order - Create a dropship order
+     * POST /proxy/orders-dropship/create-order - Create a dropship order (passthrough)
      */
     @PostMapping(value = "/orders-dropship/create-order",
                  consumes = MediaType.APPLICATION_JSON_VALUE,
                  produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createDropshipOrder(@RequestBody String requestBody) {
-        logger.info("Received request to /api/orders-dropship/create-order");
+        logger.info("Received passthrough request to /proxy/orders-dropship/create-order");
 
-        String response = service.createDropshipOrder(requestBody).block();
+        String response = client.createDropshipOrder(requestBody).block();
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .contentType(MediaType.APPLICATION_JSON)
@@ -144,14 +144,14 @@ public class ProxyController {
     }
 
     /**
-     * GET /api/orders-dropship/order-details/{orderId} - Get dropship order details
+     * GET /proxy/orders-dropship/order-details/{orderId} - Get dropship order details (passthrough)
      */
     @GetMapping(value = "/orders-dropship/order-details/{orderId}",
                 produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getOrderDetails(@PathVariable String orderId) {
-        logger.info("Received request to /api/orders-dropship/order-details/{}", orderId);
+        logger.info("Received passthrough request to /proxy/orders-dropship/order-details/{}", orderId);
 
-        String response = service.getOrderDetails(orderId).block();
+        String response = client.getOrderDetails(orderId).block();
 
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -159,14 +159,14 @@ public class ProxyController {
     }
 
     /**
-     * GET /api/orders-dropship/package-details/{packageId} - Get dropship package details
+     * GET /proxy/orders-dropship/package-details/{packageId} - Get dropship package details (passthrough)
      */
     @GetMapping(value = "/orders-dropship/package-details/{packageId}",
                 produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getPackageDetails(@PathVariable String packageId) {
-        logger.info("Received request to /api/orders-dropship/package-details/{}", packageId);
+        logger.info("Received passthrough request to /proxy/orders-dropship/package-details/{}", packageId);
 
-        String response = service.getPackageDetails(packageId).block();
+        String response = client.getPackageDetails(packageId).block();
 
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
@@ -174,7 +174,7 @@ public class ProxyController {
     }
 
     /**
-     * POST /api/orders-dropship/upload-shipping-label/{orderId} - Upload shipping label
+     * POST /proxy/orders-dropship/upload-shipping-label/{orderId} - Upload shipping label (passthrough)
      */
     @PostMapping(value = "/orders-dropship/upload-shipping-label/{orderId}",
                  consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -183,38 +183,41 @@ public class ProxyController {
             @PathVariable String orderId,
             @RequestParam("shipping_label") MultipartFile shippingLabel,
             @RequestParam("tracking_numbers") String trackingNumbers) throws IOException {
-        logger.info("Received request to /api/orders-dropship/upload-shipping-label/{}", orderId);
+        logger.info("Received passthrough request to /proxy/orders-dropship/upload-shipping-label/{}", orderId);
 
-        String response = service.uploadShippingLabel(orderId, shippingLabel, trackingNumbers).block();
+        byte[] fileContent = shippingLabel.getBytes();
+        String fileName = shippingLabel.getOriginalFilename();
+
+        String response = client.uploadShippingLabel(orderId, fileContent, fileName, trackingNumbers).block();
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .contentType(MediaType.APPLICATION_JSON)
             .body(response);
     }
 
-    // ========== Download Endpoints (with markup) ==========
+    // ========== Download Endpoints (passthrough) ==========
 
     /**
-     * Download endpoint for assortment list (with price markup)
+     * Download endpoint for assortment list (passthrough - no markup)
      */
     @GetMapping(value = "/download/assortment.json", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<byte[]> downloadAssortment(@RequestParam Map<String, String> queryParams) {
-        logger.info("Received request to /api/download/assortment.json with params: {}", queryParams);
+        logger.info("Received passthrough request to /proxy/download/assortment.json with params: {}", queryParams);
 
-        String response = service.getAssortment(queryParams).block();
+        String response = client.fetchAssortment(queryParams).block();
         byte[] content = response != null ? response.getBytes() : new byte[0];
 
         return createDownloadResponse(content, "assortment.json");
     }
 
     /**
-     * Download endpoint for assortment-flat list (with price markup)
+     * Download endpoint for assortment-flat list (passthrough - no markup)
      */
     @GetMapping(value = "/download/assortment-flat.json", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<byte[]> downloadAssortmentFlat(@RequestParam Map<String, String> queryParams) {
-        logger.info("Received request to /api/download/assortment-flat.json with params: {}", queryParams);
+        logger.info("Received passthrough request to /proxy/download/assortment-flat.json with params: {}", queryParams);
 
-        String response = service.getAssortmentFlat(queryParams).block();
+        String response = client.fetchAssortmentFlat(queryParams).block();
         byte[] content = response != null ? response.getBytes() : new byte[0];
 
         return createDownloadResponse(content, "assortment-flat.json");
