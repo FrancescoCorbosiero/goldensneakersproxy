@@ -1,0 +1,865 @@
+{
+	"info": {
+		"_postman_id": "golden-sneakers-proxy-collection",
+		"name": "Golden Sneakers Proxy API",
+		"description": "API collection for Golden Sneakers Proxy service.\n\n## Endpoint Types\n\n- **/api/*** - Endpoints with business logic applied (47% price markup)\n- **/proxy/*** - Pure passthrough to Golden Sneakers API (original prices)\n\n## Authentication\n\nAll endpoints require Basic Authentication.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "username",
+				"value": "{{proxy_username}}",
+				"type": "string"
+			},
+			{
+				"key": "password",
+				"value": "{{proxy_password}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "proxy_username",
+			"value": "shopify",
+			"type": "string"
+		},
+		{
+			"key": "proxy_password",
+			"value": "password",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "API (with markup)",
+			"description": "Endpoints with business logic applied (price markup)",
+			"item": [
+				{
+					"name": "Assortment",
+					"item": [
+						{
+							"name": "List Assortment",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/assortment?search=&ordering=",
+									"host": ["{{base_url}}"],
+									"path": ["api", "assortment"],
+									"query": [
+										{
+											"key": "search",
+											"value": "",
+											"description": "Search term"
+										},
+										{
+											"key": "ordering",
+											"value": "",
+											"description": "Field to order by"
+										},
+										{
+											"key": "markup_percentage",
+											"value": "",
+											"description": "Optional percentage markup",
+											"disabled": true
+										},
+										{
+											"key": "markup_fixed",
+											"value": "",
+											"description": "Optional fixed markup amount",
+											"disabled": true
+										},
+										{
+											"key": "vat_percentage",
+											"value": "",
+											"description": "Optional VAT percentage",
+											"disabled": true
+										},
+										{
+											"key": "rounding_type",
+											"value": "none",
+											"description": "Rounding type: none, whole, half, point_nine_nine",
+											"disabled": true
+										},
+										{
+											"key": "show_only_products_with_ean",
+											"value": "false",
+											"description": "Show only products with barcode",
+											"disabled": true
+										}
+									]
+								},
+								"description": "List all products with available sizes (with price markup applied)"
+							}
+						},
+						{
+							"name": "Get Assortment by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/assortment/:id",
+									"host": ["{{base_url}}"],
+									"path": ["api", "assortment", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Assortment ID"
+										}
+									]
+								},
+								"description": "Get a specific assortment by ID (with price markup applied)"
+							}
+						},
+						{
+							"name": "Download Assortment JSON",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/download/assortment.json",
+									"host": ["{{base_url}}"],
+									"path": ["api", "download", "assortment.json"],
+									"query": [
+										{
+											"key": "search",
+											"value": "",
+											"description": "Search term",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Download assortment as JSON file (with price markup applied)"
+							}
+						}
+					]
+				},
+				{
+					"name": "Assortment Flat",
+					"item": [
+						{
+							"name": "List Assortment Flat",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/assortment-flat?search=&ordering=",
+									"host": ["{{base_url}}"],
+									"path": ["api", "assortment-flat"],
+									"query": [
+										{
+											"key": "search",
+											"value": "",
+											"description": "Search term"
+										},
+										{
+											"key": "ordering",
+											"value": "",
+											"description": "Field to order by"
+										},
+										{
+											"key": "markup_percentage",
+											"value": "",
+											"description": "Optional percentage markup",
+											"disabled": true
+										},
+										{
+											"key": "markup_fixed",
+											"value": "",
+											"description": "Optional fixed markup amount",
+											"disabled": true
+										},
+										{
+											"key": "vat_percentage",
+											"value": "",
+											"description": "Optional VAT percentage",
+											"disabled": true
+										},
+										{
+											"key": "rounding_type",
+											"value": "none",
+											"description": "Rounding type: none, whole, half, point_nine_nine",
+											"disabled": true
+										},
+										{
+											"key": "show_only_products_with_ean",
+											"value": "false",
+											"description": "Show only products with barcode",
+											"disabled": true
+										}
+									]
+								},
+								"description": "List all sizes as individual products (flat list with price markup)"
+							}
+						},
+						{
+							"name": "Get Assortment Flat by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/assortment-flat/:id",
+									"host": ["{{base_url}}"],
+									"path": ["api", "assortment-flat", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Flat size ID"
+										}
+									]
+								},
+								"description": "Get a specific flat size by ID (with price markup applied)"
+							}
+						},
+						{
+							"name": "Download Assortment Flat JSON",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/download/assortment-flat.json",
+									"host": ["{{base_url}}"],
+									"path": ["api", "download", "assortment-flat.json"],
+									"query": [
+										{
+											"key": "search",
+											"value": "",
+											"description": "Search term",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Download assortment flat as JSON file (with price markup applied)"
+							}
+						}
+					]
+				},
+				{
+					"name": "Assortment Size",
+					"item": [
+						{
+							"name": "Get Assortment by Size",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/assortment-size?size_id=",
+									"host": ["{{base_url}}"],
+									"path": ["api", "assortment-size"],
+									"query": [
+										{
+											"key": "size_id",
+											"value": "",
+											"description": "Size ID"
+										},
+										{
+											"key": "barcode",
+											"value": "",
+											"description": "Barcode (EAN)",
+											"disabled": true
+										},
+										{
+											"key": "markup_percentage",
+											"value": "",
+											"description": "Optional percentage markup",
+											"disabled": true
+										},
+										{
+											"key": "markup_fixed",
+											"value": "",
+											"description": "Optional fixed markup amount",
+											"disabled": true
+										},
+										{
+											"key": "vat_percentage",
+											"value": "",
+											"description": "Optional VAT percentage",
+											"disabled": true
+										},
+										{
+											"key": "rounding_type",
+											"value": "none",
+											"description": "Rounding type: none, whole, half, point_nine_nine",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Retrieve product info by size ID or barcode (with price markup applied)"
+							}
+						}
+					]
+				},
+				{
+					"name": "SKU Search",
+					"item": [
+						{
+							"name": "Search SKU",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/sku-search?q=nike&limit=10",
+									"host": ["{{base_url}}"],
+									"path": ["api", "sku-search"],
+									"query": [
+										{
+											"key": "q",
+											"value": "nike",
+											"description": "Search query (min 3 characters)"
+										},
+										{
+											"key": "limit",
+											"value": "10",
+											"description": "Maximum results (default: 10)"
+										}
+									]
+								},
+								"description": "Search products by SKU or name for autocomplete"
+							}
+						}
+					]
+				},
+				{
+					"name": "Orders Dropship",
+					"item": [
+						{
+							"name": "Create Dropship Order",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"delivery_address\": {\n        \"name\": \"Mario Rossi\",\n        \"city\": \"Milano\",\n        \"zip_code\": \"20121\",\n        \"street\": \"Via Montenapoleone 12\",\n        \"country_code\": \"IT\",\n        \"phone\": \"+393401234567\",\n        \"email\": \"mario.rossi@example.it\"\n    },\n    \"client_provides_shipping_label\": false,\n    \"items\": [\n        {\n            \"size_id\": 123,\n            \"quantity\": 1\n        },\n        {\n            \"sku\": \"AIR-JORDAN-1-HIGH\",\n            \"size_us\": \"9.5\",\n            \"quantity\": 1\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/orders-dropship/create-order",
+									"host": ["{{base_url}}"],
+									"path": ["api", "orders-dropship", "create-order"]
+								},
+								"description": "Create a dropship order with delivery address.\n\n**Item identification options:**\n- Use `size_id` for direct size identification\n- Use `sku` + `size_us` for product SKU + US size identification"
+							}
+						},
+						{
+							"name": "Get Order Details",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/orders-dropship/order-details/:orderId",
+									"host": ["{{base_url}}"],
+									"path": ["api", "orders-dropship", "order-details", ":orderId"],
+									"variable": [
+										{
+											"key": "orderId",
+											"value": "123",
+											"description": "Order ID"
+										}
+									]
+								},
+								"description": "Get dropship order details.\n\n**Possible order statuses:**\n- UNCONFIRMED\n- TO_SHIP\n- ENDED\n- CANCELED\n- WAITING_FOR_INVOICE"
+							}
+						},
+						{
+							"name": "Get Package Details",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/orders-dropship/package-details/:packageId",
+									"host": ["{{base_url}}"],
+									"path": ["api", "orders-dropship", "package-details", ":packageId"],
+									"variable": [
+										{
+											"key": "packageId",
+											"value": "456",
+											"description": "Package ID"
+										}
+									]
+								},
+								"description": "Get dropship package details.\n\n**Possible package statuses:**\n- PENDING\n- READY_FOR_PROFORMA\n- WAITING_FOR_INVOICE\n- ENDED"
+							}
+						},
+						{
+							"name": "Upload Shipping Label",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "shipping_label",
+											"type": "file",
+											"src": "",
+											"description": "Shipping label file (PDF, JPG, PNG)"
+										},
+										{
+											"key": "tracking_numbers",
+											"value": "[\"1234567890\", \"0987654321\"]",
+											"type": "text",
+											"description": "JSON array of tracking numbers"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/orders-dropship/upload-shipping-label/:orderId",
+									"host": ["{{base_url}}"],
+									"path": ["api", "orders-dropship", "upload-shipping-label", ":orderId"],
+									"variable": [
+										{
+											"key": "orderId",
+											"value": "123",
+											"description": "Order ID"
+										}
+									]
+								},
+								"description": "Upload shipping label and tracking numbers for a dropship order.\n\n**Requirements:**\n- Order must have `client_provides_shipping_label=true`\n- Order must not already have shipping labels"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Proxy (passthrough)",
+			"description": "Pure passthrough endpoints - 1:1 mapping to Golden Sneakers API (no markup)",
+			"item": [
+				{
+					"name": "Assortment",
+					"item": [
+						{
+							"name": "List Assortment (passthrough)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/proxy/assortment?search=&ordering=",
+									"host": ["{{base_url}}"],
+									"path": ["proxy", "assortment"],
+									"query": [
+										{
+											"key": "search",
+											"value": "",
+											"description": "Search term"
+										},
+										{
+											"key": "ordering",
+											"value": "",
+											"description": "Field to order by"
+										}
+									]
+								},
+								"description": "List all products - original prices from Golden Sneakers"
+							}
+						},
+						{
+							"name": "Get Assortment by ID (passthrough)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/proxy/assortment/:id",
+									"host": ["{{base_url}}"],
+									"path": ["proxy", "assortment", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Assortment ID"
+										}
+									]
+								},
+								"description": "Get a specific assortment - original prices"
+							}
+						},
+						{
+							"name": "Download Assortment JSON (passthrough)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/proxy/download/assortment.json",
+									"host": ["{{base_url}}"],
+									"path": ["proxy", "download", "assortment.json"]
+								},
+								"description": "Download assortment as JSON file - original prices"
+							}
+						}
+					]
+				},
+				{
+					"name": "Assortment Flat",
+					"item": [
+						{
+							"name": "List Assortment Flat (passthrough)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/proxy/assortment-flat?search=&ordering=",
+									"host": ["{{base_url}}"],
+									"path": ["proxy", "assortment-flat"],
+									"query": [
+										{
+											"key": "search",
+											"value": "",
+											"description": "Search term"
+										},
+										{
+											"key": "ordering",
+											"value": "",
+											"description": "Field to order by"
+										}
+									]
+								},
+								"description": "List all sizes as flat products - original prices"
+							}
+						},
+						{
+							"name": "Get Assortment Flat by ID (passthrough)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/proxy/assortment-flat/:id",
+									"host": ["{{base_url}}"],
+									"path": ["proxy", "assortment-flat", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Flat size ID"
+										}
+									]
+								},
+								"description": "Get a specific flat size - original prices"
+							}
+						},
+						{
+							"name": "Download Assortment Flat JSON (passthrough)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/proxy/download/assortment-flat.json",
+									"host": ["{{base_url}}"],
+									"path": ["proxy", "download", "assortment-flat.json"]
+								},
+								"description": "Download assortment flat as JSON file - original prices"
+							}
+						}
+					]
+				},
+				{
+					"name": "Assortment Size",
+					"item": [
+						{
+							"name": "Get Assortment by Size (passthrough)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/proxy/assortment-size?size_id=",
+									"host": ["{{base_url}}"],
+									"path": ["proxy", "assortment-size"],
+									"query": [
+										{
+											"key": "size_id",
+											"value": "",
+											"description": "Size ID"
+										},
+										{
+											"key": "barcode",
+											"value": "",
+											"description": "Barcode (EAN)",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Retrieve product info by size ID or barcode - original prices"
+							}
+						}
+					]
+				},
+				{
+					"name": "SKU Search",
+					"item": [
+						{
+							"name": "Search SKU (passthrough)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/proxy/sku-search?q=nike&limit=10",
+									"host": ["{{base_url}}"],
+									"path": ["proxy", "sku-search"],
+									"query": [
+										{
+											"key": "q",
+											"value": "nike",
+											"description": "Search query (min 3 characters)"
+										},
+										{
+											"key": "limit",
+											"value": "10",
+											"description": "Maximum results"
+										}
+									]
+								},
+								"description": "Search products by SKU or name"
+							}
+						}
+					]
+				},
+				{
+					"name": "Orders Dropship",
+					"item": [
+						{
+							"name": "Create Dropship Order (passthrough)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"delivery_address\": {\n        \"name\": \"Mario Rossi\",\n        \"city\": \"Milano\",\n        \"zip_code\": \"20121\",\n        \"street\": \"Via Montenapoleone 12\",\n        \"country_code\": \"IT\",\n        \"phone\": \"+393401234567\",\n        \"email\": \"mario.rossi@example.it\"\n    },\n    \"client_provides_shipping_label\": false,\n    \"items\": [\n        {\n            \"size_id\": 123,\n            \"quantity\": 1\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/proxy/orders-dropship/create-order",
+									"host": ["{{base_url}}"],
+									"path": ["proxy", "orders-dropship", "create-order"]
+								},
+								"description": "Create a dropship order (passthrough)"
+							}
+						},
+						{
+							"name": "Get Order Details (passthrough)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/proxy/orders-dropship/order-details/:orderId",
+									"host": ["{{base_url}}"],
+									"path": ["proxy", "orders-dropship", "order-details", ":orderId"],
+									"variable": [
+										{
+											"key": "orderId",
+											"value": "123",
+											"description": "Order ID"
+										}
+									]
+								},
+								"description": "Get dropship order details (passthrough)"
+							}
+						},
+						{
+							"name": "Get Package Details (passthrough)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/proxy/orders-dropship/package-details/:packageId",
+									"host": ["{{base_url}}"],
+									"path": ["proxy", "orders-dropship", "package-details", ":packageId"],
+									"variable": [
+										{
+											"key": "packageId",
+											"value": "456",
+											"description": "Package ID"
+										}
+									]
+								},
+								"description": "Get dropship package details (passthrough)"
+							}
+						},
+						{
+							"name": "Upload Shipping Label (passthrough)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "shipping_label",
+											"type": "file",
+											"src": "",
+											"description": "Shipping label file"
+										},
+										{
+											"key": "tracking_numbers",
+											"value": "[\"1234567890\"]",
+											"type": "text",
+											"description": "JSON array of tracking numbers"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/proxy/orders-dropship/upload-shipping-label/:orderId",
+									"host": ["{{base_url}}"],
+									"path": ["proxy", "orders-dropship", "upload-shipping-label", ":orderId"],
+									"variable": [
+										{
+											"key": "orderId",
+											"value": "123",
+											"description": "Order ID"
+										}
+									]
+								},
+								"description": "Upload shipping label (passthrough)"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/health",
+							"host": ["{{base_url}}"],
+							"path": ["actuator", "health"]
+						},
+						"description": "Health check endpoint (no auth required)"
+					}
+				}
+			]
+		}
+	]
+}
