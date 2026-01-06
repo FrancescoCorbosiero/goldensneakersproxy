@@ -13,11 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * REST controller for catalog synchronization operations.
- * All operations are bulk-focused.
+ * REST controller for catalog synchronization.
+ * Simple bulk operations.
  */
 @RestController
 @RequestMapping("/api/catalog")
@@ -32,26 +33,20 @@ public class CatalogController {
     }
 
     /**
-     * Synchronize the entire catalog.
-     *
+     * Sync catalog - creates new, updates existing.
      * POST /api/catalog/sync
-     *
-     * Body: Array of CatalogProductRequest
-     *
-     * Response: SyncResultResponse
      */
     @PostMapping("/sync")
     public ResponseEntity<SyncResultResponse> syncCatalog(
             @RequestBody List<CatalogProductRequest> feed) {
 
-        log.info("Received sync request with {} products", feed.size());
+        log.info("Sync request: {} products", feed.size());
 
         if (feed.isEmpty()) {
-            log.warn("Empty feed received, nothing to sync");
-            SyncResult emptyResult = new SyncResult();
-            emptyResult.setStatus("SUCCESS");
-            emptyResult.addWarning("Empty feed - no products to sync");
-            return ResponseEntity.ok(SyncResultResponse.from(emptyResult));
+            SyncResult empty = new SyncResult();
+            empty.setStatus("SUCCESS");
+            empty.addWarning("Empty feed");
+            return ResponseEntity.ok(SyncResultResponse.from(empty));
         }
 
         List<CatalogProduct> products = feed.stream()
@@ -59,25 +54,59 @@ public class CatalogController {
                 .collect(Collectors.toList());
 
         SyncResult result = syncService.syncCatalog(products);
-
         return ResponseEntity.ok(SyncResultResponse.from(result));
     }
 
     /**
-     * Handle sync exceptions.
+     * Mark products as out of stock.
+     * POST /api/catalog/mark-out-of-stock
      */
+    @PostMapping("/mark-out-of-stock")
+    public ResponseEntity<Map<String, Object>> markOutOfStock(
+            @RequestBody List<Long> productIds) {
+
+        log.info("Mark out of stock: {} products", productIds.size());
+
+        int count = syncService.markOutOfStock(productIds);
+
+        return ResponseEntity.ok(Map.of(
+                "status", "SUCCESS",
+                "markedOutOfStock", count
+        ));
+    }
+
+    /**
+     * Find products in shop but not in feed.
+     * POST /api/catalog/find-missing
+     */
+    @PostMapping("/find-missing")
+    public ResponseEntity<Map<String, Object>> findMissing(
+            @RequestBody List<CatalogProductRequest> feed) {
+
+        log.info("Find missing: comparing {} feed products", feed.size());
+
+        List<CatalogProduct> products = feed.stream()
+                .map(CatalogProductRequest::toDomain)
+                .collect(Collectors.toList());
+
+        List<Long> missing = syncService.findMissingProducts(products);
+
+        return ResponseEntity.ok(Map.of(
+                "status", "SUCCESS",
+                "missingProductIds", missing,
+                "count", missing.size()
+        ));
+    }
+
     @ExceptionHandler(CatalogSyncException.class)
     public ResponseEntity<SyncResultResponse> handleSyncException(CatalogSyncException e) {
-        log.error("Catalog sync failed: {}", e.getMessage());
+        log.error("Sync failed: {}", e.getMessage());
 
-        SyncResult failedResult = new SyncResult();
-        failedResult.setStatus("FAILED");
-        failedResult.setErrorMessage(e.getMessage());
-        if (e.isRolledBack()) {
-            failedResult.addWarning("Transaction was rolled back");
-        }
+        SyncResult failed = new SyncResult();
+        failed.setStatus("FAILED");
+        failed.setErrorMessage(e.getMessage());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(SyncResultResponse.from(failedResult));
+                .body(SyncResultResponse.from(failed));
     }
 }

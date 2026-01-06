@@ -5,8 +5,6 @@ import it.alpacode.goldensneakersproxy.client.woocommerce.dto.DimensionsDto;
 import it.alpacode.goldensneakersproxy.client.woocommerce.dto.ImageDto;
 import it.alpacode.goldensneakersproxy.client.woocommerce.dto.MetaDataDto;
 import it.alpacode.goldensneakersproxy.model.CatalogProduct;
-import it.alpacode.goldensneakersproxy.model.CatalogVariation;
-import it.alpacode.goldensneakersproxy.model.TaxonomyRef;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +12,7 @@ import java.util.stream.Collectors;
 
 /**
  * Request DTO for catalog product sync.
+ * All taxonomy references are IDs - caller provides valid IDs.
  */
 public class CatalogProductRequest {
 
@@ -26,9 +25,9 @@ public class CatalogProductRequest {
     private String weight;
     private DimensionsDto dimensions;
 
-    // Taxonomies - can be IDs or names
-    private List<String> brands = new ArrayList<>();
-    private List<String> tags = new ArrayList<>();
+    // Taxonomies - all IDs
+    private List<Long> brandIds = new ArrayList<>();
+    private List<Long> tagIds = new ArrayList<>();
     private List<Long> categoryIds = new ArrayList<>();
 
     // Media
@@ -63,22 +62,12 @@ public class CatalogProductRequest {
         product.setAttributes(attributes);
         product.setMetaData(metaData);
 
-        // Convert brand names to TaxonomyRefs
-        product.setBrands(brands.stream()
-                .map(TaxonomyRef::ofName)
-                .collect(Collectors.toList()));
+        // IDs directly
+        product.setBrandIds(brandIds != null ? brandIds : new ArrayList<>());
+        product.setTagIds(tagIds != null ? tagIds : new ArrayList<>());
+        product.setCategoryIds(categoryIds != null ? categoryIds : new ArrayList<>());
 
-        // Convert tag names to TaxonomyRefs
-        product.setTags(tags.stream()
-                .map(TaxonomyRef::ofName)
-                .collect(Collectors.toList()));
-
-        // Convert category IDs to TaxonomyRefs
-        product.setCategories(categoryIds.stream()
-                .map(TaxonomyRef::ofId)
-                .collect(Collectors.toList()));
-
-        // Convert variations
+        // Variations
         product.setVariations(variations.stream()
                 .map(CatalogVariationRequest::toDomain)
                 .collect(Collectors.toList()));
@@ -152,20 +141,20 @@ public class CatalogProductRequest {
         this.dimensions = dimensions;
     }
 
-    public List<String> getBrands() {
-        return brands;
+    public List<Long> getBrandIds() {
+        return brandIds;
     }
 
-    public void setBrands(List<String> brands) {
-        this.brands = brands;
+    public void setBrandIds(List<Long> brandIds) {
+        this.brandIds = brandIds;
     }
 
-    public List<String> getTags() {
-        return tags;
+    public List<Long> getTagIds() {
+        return tagIds;
     }
 
-    public void setTags(List<String> tags) {
-        this.tags = tags;
+    public void setTagIds(List<Long> tagIds) {
+        this.tagIds = tagIds;
     }
 
     public List<Long> getCategoryIds() {

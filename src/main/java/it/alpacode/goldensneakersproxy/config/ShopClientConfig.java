@@ -14,7 +14,7 @@ import java.time.Duration;
 import java.util.Base64;
 
 /**
- * Configuration for WooCommerce and WordPress API clients.
+ * Configuration for WooCommerce API client.
  */
 @Configuration
 @EnableConfigurationProperties(ShopProperties.class)
@@ -41,30 +41,6 @@ public class ShopClientConfig {
 
         return WebClient.builder()
                 .baseUrl(shopProperties.getBaseUrl() + shopProperties.getWoocommerce().getApiPath())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + basicAuth)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .exchangeStrategies(strategies)
-                .build();
-    }
-
-    @Bean
-    public WebClient wordPressWebClient() {
-        // WordPress API uses the same authentication as WooCommerce
-        String credentials = shopProperties.getWoocommerce().getConsumerKey()
-                + ":" + shopProperties.getWoocommerce().getConsumerSecret();
-        String basicAuth = Base64.getEncoder().encodeToString(credentials.getBytes());
-
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMillis(shopProperties.getWoocommerce().getTimeout()));
-
-        ExchangeStrategies strategies = ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(50 * 1024 * 1024))
-                .build();
-
-        return WebClient.builder()
-                .baseUrl(shopProperties.getBaseUrl() + shopProperties.getWordpress().getApiPath())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + basicAuth)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)

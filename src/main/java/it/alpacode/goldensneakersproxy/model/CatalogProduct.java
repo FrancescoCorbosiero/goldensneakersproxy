@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * Domain model for a catalog product to be synchronized.
+ * All taxonomy references are IDs - caller provides valid IDs.
  */
 public class CatalogProduct {
 
@@ -22,10 +23,10 @@ public class CatalogProduct {
     private String weight;
     private DimensionsDto dimensions;
 
-    // Taxonomies
-    private List<TaxonomyRef> brands = new ArrayList<>();
-    private List<TaxonomyRef> tags = new ArrayList<>();
-    private List<TaxonomyRef> categories = new ArrayList<>();
+    // Taxonomies - IDs only, caller provides them
+    private List<Long> brandIds = new ArrayList<>();
+    private List<Long> tagIds = new ArrayList<>();
+    private List<Long> categoryIds = new ArrayList<>();
 
     // Media
     private List<ImageDto> images = new ArrayList<>();
@@ -106,28 +107,28 @@ public class CatalogProduct {
         this.dimensions = dimensions;
     }
 
-    public List<TaxonomyRef> getBrands() {
-        return brands;
+    public List<Long> getBrandIds() {
+        return brandIds;
     }
 
-    public void setBrands(List<TaxonomyRef> brands) {
-        this.brands = brands;
+    public void setBrandIds(List<Long> brandIds) {
+        this.brandIds = brandIds;
     }
 
-    public List<TaxonomyRef> getTags() {
-        return tags;
+    public List<Long> getTagIds() {
+        return tagIds;
     }
 
-    public void setTags(List<TaxonomyRef> tags) {
-        this.tags = tags;
+    public void setTagIds(List<Long> tagIds) {
+        this.tagIds = tagIds;
     }
 
-    public List<TaxonomyRef> getCategories() {
-        return categories;
+    public List<Long> getCategoryIds() {
+        return categoryIds;
     }
 
-    public void setCategories(List<TaxonomyRef> categories) {
-        this.categories = categories;
+    public void setCategoryIds(List<Long> categoryIds) {
+        this.categoryIds = categoryIds;
     }
 
     public List<ImageDto> getImages() {

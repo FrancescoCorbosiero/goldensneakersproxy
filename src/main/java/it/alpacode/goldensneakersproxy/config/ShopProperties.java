@@ -3,15 +3,13 @@ package it.alpacode.goldensneakersproxy.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Configuration properties for WooCommerce/WordPress shop integration.
+ * Configuration for WooCommerce shop integration.
  */
 @ConfigurationProperties(prefix = "shop")
 public class ShopProperties {
 
     private String baseUrl;
     private WooCommerceProperties woocommerce = new WooCommerceProperties();
-    private WordPressProperties wordpress = new WordPressProperties();
-    private SyncProperties sync = new SyncProperties();
 
     public String getBaseUrl() {
         return baseUrl;
@@ -29,28 +27,13 @@ public class ShopProperties {
         this.woocommerce = woocommerce;
     }
 
-    public WordPressProperties getWordpress() {
-        return wordpress;
-    }
-
-    public void setWordpress(WordPressProperties wordpress) {
-        this.wordpress = wordpress;
-    }
-
-    public SyncProperties getSync() {
-        return sync;
-    }
-
-    public void setSync(SyncProperties sync) {
-        this.sync = sync;
-    }
-
     public static class WooCommerceProperties {
         private String apiPath = "/wp-json/wc/v3";
         private String consumerKey;
         private String consumerSecret;
         private int batchSize = 100;
         private int timeout = 60000;
+        private int rateLimitDelayMs = 2000;
 
         public String getApiPath() {
             return apiPath;
@@ -90,49 +73,6 @@ public class ShopProperties {
 
         public void setTimeout(int timeout) {
             this.timeout = timeout;
-        }
-    }
-
-    public static class WordPressProperties {
-        private String apiPath = "/wp-json/wp/v2";
-
-        public String getApiPath() {
-            return apiPath;
-        }
-
-        public void setApiPath(String apiPath) {
-            this.apiPath = apiPath;
-        }
-    }
-
-    public static class SyncProperties {
-        private boolean parallelVariations = true;
-        private int maxThreads = 10;
-        private boolean markMissingOutOfStock = true;
-        private int rateLimitDelayMs = 2000;
-
-        public boolean isParallelVariations() {
-            return parallelVariations;
-        }
-
-        public void setParallelVariations(boolean parallelVariations) {
-            this.parallelVariations = parallelVariations;
-        }
-
-        public int getMaxThreads() {
-            return maxThreads;
-        }
-
-        public void setMaxThreads(int maxThreads) {
-            this.maxThreads = maxThreads;
-        }
-
-        public boolean isMarkMissingOutOfStock() {
-            return markMissingOutOfStock;
-        }
-
-        public void setMarkMissingOutOfStock(boolean markMissingOutOfStock) {
-            this.markMissingOutOfStock = markMissingOutOfStock;
         }
 
         public int getRateLimitDelayMs() {

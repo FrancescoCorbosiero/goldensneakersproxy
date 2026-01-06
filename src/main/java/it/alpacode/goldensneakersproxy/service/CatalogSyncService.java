@@ -2,7 +2,6 @@ package it.alpacode.goldensneakersproxy.service;
 
 import it.alpacode.goldensneakersproxy.client.woocommerce.WooCommerceClient;
 import it.alpacode.goldensneakersproxy.client.woocommerce.dto.*;
-import it.alpacode.goldensneakersproxy.config.ShopProperties;
 import it.alpacode.goldensneakersproxy.exception.CatalogSyncException;
 import it.alpacode.goldensneakersproxy.model.*;
 import org.slf4j.Logger;
@@ -10,12 +9,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
- * Main orchestrator for catalog synchronization.
- * Coordinates the bulk sync process with transactional support.
+ * Catalog sync service - simple and idempotent.
+ *
+ * Flow: fetch existing → diff → batch create/update → variations
+ *
+ * No transaction rollback (idempotent - can re-run safely).
+ * No auto taxonomy creation (caller provides IDs).
+ * Sequential variation processing (predictable).
  */
 @Service
 public class CatalogSyncService {
@@ -23,327 +26,191 @@ public class CatalogSyncService {
     private static final Logger log = LoggerFactory.getLogger(CatalogSyncService.class);
 
     private final WooCommerceClient wooClient;
-    private final TaxonomyResolverService taxonomyResolver;
     private final ProductDiffService diffService;
-    private final SyncTransactionManager transactionManager;
-    private final ShopProperties shopProperties;
 
-    public CatalogSyncService(
-            WooCommerceClient wooClient,
-            TaxonomyResolverService taxonomyResolver,
-            ProductDiffService diffService,
-            SyncTransactionManager transactionManager,
-            ShopProperties shopProperties) {
+    public CatalogSyncService(WooCommerceClient wooClient, ProductDiffService diffService) {
         this.wooClient = wooClient;
-        this.taxonomyResolver = taxonomyResolver;
         this.diffService = diffService;
-        this.transactionManager = transactionManager;
-        this.shopProperties = shopProperties;
     }
 
     /**
-     * Synchronize the entire catalog.
-     * - Creates new products
-     * - Updates existing products
-     * - Marks missing products as out of stock
-     *
-     * Transactional: automatic rollback on error.
+     * Sync products: creates new, updates existing.
+     * Idempotent - safe to re-run.
      */
     public SyncResult syncCatalog(List<CatalogProduct> feedProducts) {
-        log.info("Starting catalog sync with {} products from feed", feedProducts.size());
-
+        log.info("Starting catalog sync with {} products", feedProducts.size());
         long startTime = System.currentTimeMillis();
-        SyncResult result = SyncResult.success();
-        String transactionId = transactionManager.begin();
+        SyncResult result = new SyncResult();
 
         try {
-            // PHASE 1: TAXONOMY RESOLUTION
-            log.info("[Phase 1/6] Resolving taxonomies...");
-            TaxonomyResolutionResult taxonomies = taxonomyResolver.resolveAll(feedProducts);
-            result.setTaxonomiesCreated(taxonomies.getCreatedCount());
-            log.info("Taxonomies resolved - {} created", taxonomies.getCreatedCount());
+            // 1. Fetch existing products
+            log.info("[1/4] Fetching existing products...");
+            Map<String, ProductDto> existing = wooClient.fetchAllProductsBySku();
+            log.info("Found {} existing products", existing.size());
 
-            // PHASE 2: FETCH EXISTING PRODUCTS
-            log.info("[Phase 2/6] Fetching existing products from shop...");
-            Map<String, ProductDto> existingProducts = wooClient.fetchAllProductsBySku();
-            log.info("Fetched {} existing products", existingProducts.size());
+            // 2. Calculate diff
+            log.info("[2/4] Calculating diff...");
+            CatalogDiff diff = diffService.calculateDiff(feedProducts, existing);
+            log.info("Diff: {} to create, {} to update",
+                    diff.getToCreate().size(), diff.getToUpdate().size());
 
-            // PHASE 3: DIFF CALCULATION
-            log.info("[Phase 3/6] Calculating diff...");
-            CatalogDiff diff = diffService.calculateDiff(feedProducts, existingProducts);
-
-            log.info("Diff summary - Create: {}, Update: {}, MarkOutOfStock: {}",
-                    diff.getToCreate().size(),
-                    diff.getToUpdate().size(),
-                    diff.getToMarkOutOfStock().size());
-
-            // PHASE 4: BATCH CREATE
+            // 3. Batch create new products
             if (!diff.getToCreate().isEmpty()) {
-                log.info("[Phase 4/6] Creating {} new products...", diff.getToCreate().size());
-                List<ProductCreateRequestDto> createRequests = buildProductCreateRequests(
-                        diff.getToCreate(), taxonomies);
-                List<ProductDto> created = wooClient.createProductsBatch(createRequests);
+                log.info("[3/4] Creating {} products...", diff.getToCreate().size());
+                List<ProductCreateRequestDto> requests = buildCreateRequests(diff.getToCreate());
+                List<ProductDto> created = wooClient.createProductsBatch(requests);
                 result.addCreated(created);
-                transactionManager.trackCreated(transactionId, created);
-                log.info("Created {} products", created.size());
+
+                // Add created to existing map for variation processing
+                for (ProductDto p : created) {
+                    if (p.getSku() != null) {
+                        existing.put(p.getSku(), p);
+                    }
+                }
             } else {
-                log.info("[Phase 4/6] No products to create");
+                log.info("[3/4] No products to create");
             }
 
-            // PHASE 5: BATCH UPDATE
+            // 4. Batch update existing products
             if (!diff.getToUpdate().isEmpty()) {
-                log.info("[Phase 5/6] Updating {} products...", diff.getToUpdate().size());
-                List<ProductUpdateRequestDto> updateRequests = buildProductUpdateRequests(
-                        diff.getToUpdate(), taxonomies, existingProducts);
-                List<ProductDto> updated = wooClient.updateProductsBatch(updateRequests);
+                log.info("[4/4] Updating {} products...", diff.getToUpdate().size());
+                List<ProductUpdateRequestDto> requests = buildUpdateRequests(diff.getToUpdate(), existing);
+                List<ProductDto> updated = wooClient.updateProductsBatch(requests);
                 result.addUpdated(updated);
-                log.info("Updated {} products", updated.size());
             } else {
-                log.info("[Phase 5/6] No products to update");
+                log.info("[4/4] No products to update");
             }
 
-            // PHASE 6: MARK OUT OF STOCK
-            if (shopProperties.getSync().isMarkMissingOutOfStock() && !diff.getToMarkOutOfStock().isEmpty()) {
-                log.info("[Phase 6/6] Marking {} products out of stock...",
-                        diff.getToMarkOutOfStock().size());
-                wooClient.markOutOfStockBatch(diff.getToMarkOutOfStock());
-                result.addMarkedOutOfStock(diff.getToMarkOutOfStock().size());
-                log.info("Marked {} products out of stock", diff.getToMarkOutOfStock().size());
-            } else {
-                log.info("[Phase 6/6] No products to mark out of stock");
-            }
-
-            // PHASE 7: CREATE VARIATIONS IN PARALLEL
-            log.info("Creating variations...");
-            List<ProductDto> allProducts = new ArrayList<>();
-            allProducts.addAll(result.getCreated());
-            allProducts.addAll(result.getUpdated());
-
-            Map<Long, List<VariationDto>> variations = createVariationsParallel(
-                    allProducts, feedProducts);
+            // 5. Process variations sequentially
+            log.info("Processing variations...");
+            Map<Long, List<VariationDto>> variations = processVariations(feedProducts, existing);
             result.setVariations(variations);
-            log.info("Created/updated {} total variations", result.getTotalVariationsCount());
-
-            // Commit transaction
-            transactionManager.commit(transactionId);
 
             result.setDurationMs(System.currentTimeMillis() - startTime);
             result.setStatus("SUCCESS");
 
-            log.info("Sync completed successfully in {}ms: {} created, {} updated, {} marked out of stock, {} variations",
+            log.info("Sync complete in {}ms: {} created, {} updated, {} variations",
                     result.getDurationMs(),
                     result.getCreatedCount(),
                     result.getUpdatedCount(),
-                    result.getMarkedOutOfStockCount(),
                     result.getTotalVariationsCount());
 
             return result;
 
         } catch (Exception e) {
-            log.error("Sync failed, rolling back transaction {}", transactionId, e);
-
-            try {
-                transactionManager.rollback(transactionId);
-            } catch (Exception rollbackError) {
-                log.error("Rollback also failed", rollbackError);
-            }
-
+            log.error("Sync failed: {}", e.getMessage(), e);
             result.setDurationMs(System.currentTimeMillis() - startTime);
             result.setStatus("FAILED");
             result.setErrorMessage(e.getMessage());
-
-            throw new CatalogSyncException("Catalog sync failed and was rolled back", e, true);
+            throw new CatalogSyncException("Catalog sync failed: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Create variations for all products in parallel.
+     * Mark products as out of stock.
+     * Separate operation - caller decides when to use it.
      */
-    private Map<Long, List<VariationDto>> createVariationsParallel(
-            List<ProductDto> products,
-            List<CatalogProduct> feedProducts) {
-
-        if (!shopProperties.getSync().isParallelVariations()) {
-            return createVariationsSequential(products, feedProducts);
+    public int markOutOfStock(List<Long> productIds) {
+        if (productIds.isEmpty()) {
+            return 0;
         }
+        log.info("Marking {} products out of stock", productIds.size());
+        wooClient.markOutOfStockBatch(productIds);
+        return productIds.size();
+    }
 
-        Map<String, CatalogProduct> feedMap = feedProducts.stream()
-                .collect(Collectors.toMap(CatalogProduct::getSku, p -> p, (a, b) -> a));
+    /**
+     * Get product IDs that are in shop but not in feed.
+     */
+    public List<Long> findMissingProducts(List<CatalogProduct> feedProducts) {
+        Map<String, ProductDto> existing = wooClient.fetchAllProductsBySku();
+        CatalogDiff diff = diffService.calculateDiff(feedProducts, existing);
+        return diff.getToMarkOutOfStock();
+    }
 
-        Map<Long, List<VariationDto>> results = new ConcurrentHashMap<>();
-        int maxThreads = shopProperties.getSync().getMaxThreads();
+    private List<ProductCreateRequestDto> buildCreateRequests(List<CatalogProduct> products) {
+        return products.stream().map(p -> {
+            ProductCreateRequestDto dto = new ProductCreateRequestDto();
+            dto.setName(p.getName());
+            dto.setSku(p.getSku());
+            dto.setType(p.getType());
+            dto.setStatus(p.getStatus());
+            dto.setDescription(p.getDescription());
+            dto.setShortDescription(p.getShortDescription());
+            dto.setWeight(p.getWeight());
+            dto.setDimensions(p.getDimensions());
+            dto.setImages(p.getImages());
+            dto.setMetaData(p.getMetaData());
 
-        ExecutorService executor = Executors.newFixedThreadPool(maxThreads);
-        List<Future<?>> futures = new ArrayList<>();
+            // Taxonomies - IDs directly
+            dto.setBrands(p.getBrandIds());
+            dto.setTags(p.getTagIds().stream().map(TagDto::new).toList());
+            dto.setCategories(p.getCategoryIds().stream().map(CategoryDto::new).toList());
 
-        for (ProductDto product : products) {
-            if (product.getSku() == null) continue;
-
-            CatalogProduct feedProduct = feedMap.get(product.getSku());
-            if (feedProduct == null || feedProduct.getVariations().isEmpty()) continue;
-
-            futures.add(executor.submit(() -> {
-                try {
-                    List<VariationDto> variations = wooClient.upsertVariations(
-                            product.getId(),
-                            feedProduct.getVariations());
-                    results.put(product.getId(), variations);
-                } catch (Exception e) {
-                    log.error("Failed to create variations for product {} ({})",
-                            product.getId(), product.getSku(), e);
-                    throw new RuntimeException("Variation creation failed for product " + product.getId(), e);
-                }
-            }));
-        }
-
-        // Wait for all variations to complete
-        for (Future<?> future : futures) {
-            try {
-                future.get(60, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Variation creation interrupted", e);
-            } catch (ExecutionException e) {
-                throw new RuntimeException("Variation creation failed", e.getCause());
-            } catch (TimeoutException e) {
-                throw new RuntimeException("Variation creation timed out", e);
+            // Build size attribute from variations
+            if ("variable".equals(p.getType()) && !p.getVariations().isEmpty()) {
+                List<String> sizes = p.getAllSizes();
+                AttributeDto sizeAttr = new AttributeDto("Taglie", sizes);
+                sizeAttr.setVisible(true);
+                sizeAttr.setVariation(true);
+                dto.setAttributes(List.of(sizeAttr));
+            } else if (!p.getAttributes().isEmpty()) {
+                dto.setAttributes(p.getAttributes());
             }
-        }
 
-        executor.shutdown();
-
-        return results;
+            return dto;
+        }).toList();
     }
 
-    /**
-     * Create variations sequentially (fallback).
-     */
-    private Map<Long, List<VariationDto>> createVariationsSequential(
-            List<ProductDto> products,
-            List<CatalogProduct> feedProducts) {
+    private List<ProductUpdateRequestDto> buildUpdateRequests(
+            List<CatalogProduct> products,
+            Map<String, ProductDto> existing) {
 
-        Map<String, CatalogProduct> feedMap = feedProducts.stream()
-                .collect(Collectors.toMap(CatalogProduct::getSku, p -> p, (a, b) -> a));
+        return products.stream().map(p -> {
+            ProductDto ex = existing.get(p.getSku());
+            if (ex == null) return null;
+
+            ProductUpdateRequestDto dto = new ProductUpdateRequestDto();
+            dto.setId(ex.getId());
+            dto.setName(p.getName());
+            dto.setDescription(p.getDescription());
+            dto.setShortDescription(p.getShortDescription());
+            dto.setImages(p.getImages());
+            dto.setMetaData(p.getMetaData());
+            dto.setStockStatus("instock");
+
+            // Taxonomies
+            dto.setBrands(p.getBrandIds());
+            dto.setTags(p.getTagIds().stream().map(TagDto::new).toList());
+
+            return dto;
+        }).filter(Objects::nonNull).toList();
+    }
+
+    private Map<Long, List<VariationDto>> processVariations(
+            List<CatalogProduct> feedProducts,
+            Map<String, ProductDto> existing) {
 
         Map<Long, List<VariationDto>> results = new HashMap<>();
 
-        for (ProductDto product : products) {
-            if (product.getSku() == null) continue;
+        for (CatalogProduct feed : feedProducts) {
+            if (feed.getVariations().isEmpty()) continue;
 
-            CatalogProduct feedProduct = feedMap.get(product.getSku());
-            if (feedProduct == null || feedProduct.getVariations().isEmpty()) continue;
+            ProductDto product = existing.get(feed.getSku());
+            if (product == null) continue;
 
             try {
                 List<VariationDto> variations = wooClient.upsertVariations(
                         product.getId(),
-                        feedProduct.getVariations());
+                        feed.getVariations());
                 results.put(product.getId(), variations);
+                log.debug("Product {} - {} variations", product.getSku(), variations.size());
             } catch (Exception e) {
-                log.error("Failed to create variations for product {} ({})",
-                        product.getId(), product.getSku(), e);
-                throw new RuntimeException("Variation creation failed", e);
+                log.error("Failed variations for product {}: {}", feed.getSku(), e.getMessage());
+                // Continue with other products - don't fail entire sync
             }
         }
 
         return results;
-    }
-
-    /**
-     * Build product create requests from catalog products.
-     */
-    private List<ProductCreateRequestDto> buildProductCreateRequests(
-            List<CatalogProduct> products,
-            TaxonomyResolutionResult taxonomies) {
-
-        return products.stream()
-                .map(p -> {
-                    ProductCreateRequestDto dto = new ProductCreateRequestDto();
-                    dto.setName(p.getName());
-                    dto.setSku(p.getSku());
-                    dto.setType(p.getType());
-                    dto.setStatus(p.getStatus());
-                    dto.setDescription(p.getDescription());
-                    dto.setShortDescription(p.getShortDescription());
-                    dto.setWeight(p.getWeight());
-                    dto.setDimensions(p.getDimensions());
-
-                    // Resolve taxonomies
-                    dto.setBrands(taxonomies.resolveBrands(p.getBrands()));
-                    dto.setTags(buildTagDtos(taxonomies.resolveTags(p.getTags())));
-                    dto.setCategories(buildCategoryDtos(taxonomies.resolveCategories(p.getCategories())));
-
-                    // Set images
-                    dto.setImages(p.getImages());
-
-                    // Build attributes from variations (for variable products)
-                    if ("variable".equals(p.getType()) && !p.getVariations().isEmpty()) {
-                        List<String> sizes = p.getAllSizes();
-                        AttributeDto sizeAttr = new AttributeDto("Taglie", sizes);
-                        sizeAttr.setVisible(true);
-                        sizeAttr.setVariation(true);
-                        dto.setAttributes(List.of(sizeAttr));
-                    } else if (!p.getAttributes().isEmpty()) {
-                        dto.setAttributes(p.getAttributes());
-                    }
-
-                    dto.setMetaData(p.getMetaData());
-
-                    return dto;
-                })
-                .toList();
-    }
-
-    /**
-     * Build product update requests from catalog products.
-     */
-    private List<ProductUpdateRequestDto> buildProductUpdateRequests(
-            List<CatalogProduct> products,
-            TaxonomyResolutionResult taxonomies,
-            Map<String, ProductDto> existingProducts) {
-
-        return products.stream()
-                .map(p -> {
-                    ProductDto existing = existingProducts.get(p.getSku());
-                    if (existing == null) return null;
-
-                    ProductUpdateRequestDto dto = new ProductUpdateRequestDto();
-                    dto.setId(existing.getId());
-                    dto.setName(p.getName());
-                    dto.setDescription(p.getDescription());
-                    dto.setShortDescription(p.getShortDescription());
-
-                    // Resolve taxonomies
-                    dto.setBrands(taxonomies.resolveBrands(p.getBrands()));
-                    dto.setTags(buildTagDtos(taxonomies.resolveTags(p.getTags())));
-
-                    // Set images
-                    dto.setImages(p.getImages());
-                    dto.setMetaData(p.getMetaData());
-
-                    // Set stock status back to instock
-                    dto.setStockStatus("instock");
-
-                    return dto;
-                })
-                .filter(Objects::nonNull)
-                .toList();
-    }
-
-    /**
-     * Build TagDto list from resolved IDs.
-     */
-    private List<TagDto> buildTagDtos(List<Long> ids) {
-        return ids.stream()
-                .map(TagDto::new)
-                .toList();
-    }
-
-    /**
-     * Build CategoryDto list from resolved IDs.
-     */
-    private List<CategoryDto> buildCategoryDtos(List<Long> ids) {
-        return ids.stream()
-                .map(CategoryDto::new)
-                .toList();
     }
 }
