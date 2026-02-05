@@ -31,7 +31,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/**", "/download/**", "/woo/**").authenticated()
+                .requestMatchers("/api/**", "/download/**", "/woo/**", "/wp-upload/**").authenticated()
                 .requestMatchers("/h2-console/**").permitAll()
                 .anyRequest().permitAll()
             )

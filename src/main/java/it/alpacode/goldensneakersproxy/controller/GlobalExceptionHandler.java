@@ -1,6 +1,8 @@
 package it.alpacode.goldensneakersproxy.controller;
 
 import it.alpacode.goldensneakersproxy.service.GoldenSneakersClient;
+import it.alpacode.goldensneakersproxy.service.WordPressClient;
+import it.alpacode.goldensneakersproxy.service.WordPressUploadService;
 import it.alpacode.goldensneakersproxy.service.WooProductService;
 import it.alpacode.goldensneakersproxy.service.WooVariationService;
 import org.slf4j.Logger;
@@ -65,6 +67,42 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .contentType(MediaType.APPLICATION_JSON)
             .body(new ErrorResponse("variation_not_found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(WordPressClient.WordPressApiException.class)
+    public ResponseEntity<ErrorResponse> handleWordPressApiException(
+            WordPressClient.WordPressApiException ex) {
+        logger.error("WordPress API error: {}", ex.getMessage());
+
+        int statusCode = ex.getStatusCode();
+        String message = ex.getMessage();
+
+        if (statusCode == 401 || statusCode == 403) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResponse("wordpress_auth_error",
+                    "Authentication failed with WordPress API. Consumer key/secret may be invalid."));
+        }
+
+        if (statusCode >= 400 && statusCode < 500) {
+            return ResponseEntity.status(statusCode)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResponse("wordpress_error", message));
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponse("wordpress_error", message));
+    }
+
+    @ExceptionHandler(WordPressUploadService.WordPressUploadException.class)
+    public ResponseEntity<ErrorResponse> handleWordPressUploadException(
+            WordPressUploadService.WordPressUploadException ex) {
+        logger.error("WordPress upload error: {}", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponse("wordpress_upload_error", ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
