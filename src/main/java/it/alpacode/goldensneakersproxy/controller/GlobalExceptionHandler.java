@@ -1,6 +1,8 @@
 package it.alpacode.goldensneakersproxy.controller;
 
 import it.alpacode.goldensneakersproxy.service.GoldenSneakersClient;
+import it.alpacode.goldensneakersproxy.service.WooProductService;
+import it.alpacode.goldensneakersproxy.service.WooVariationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -43,6 +45,26 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
             .contentType(MediaType.APPLICATION_JSON)
             .body(new ErrorResponse("upstream_error", message));
+    }
+
+    @ExceptionHandler(WooProductService.ProductNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProductNotFoundException(
+            WooProductService.ProductNotFoundException ex) {
+        logger.warn("Product not found: {}", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponse("product_not_found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(WooVariationService.VariationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleVariationNotFoundException(
+            WooVariationService.VariationNotFoundException ex) {
+        logger.warn("Variation not found: {}", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponse("variation_not_found", ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
