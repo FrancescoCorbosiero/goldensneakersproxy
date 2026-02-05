@@ -9,10 +9,7 @@ public class ProductDownload {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long dbId;
-
-    @Column(name = "download_id")
-    private String id;
+    private Long id;
 
     private String name;
 
@@ -27,19 +24,11 @@ public class ProductDownload {
     public ProductDownload() {
     }
 
-    public Long getDbId() {
-        return dbId;
-    }
-
-    public void setDbId(Long dbId) {
-        this.dbId = dbId;
-    }
-
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -11,10 +11,7 @@ public class ProductAttribute {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long dbId;
-
-    @Column(name = "attribute_id")
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -25,7 +22,7 @@ public class ProductAttribute {
     private Boolean variation;
 
     @ElementCollection
-    @CollectionTable(name = "woo_product_attribute_options", joinColumns = @JoinColumn(name = "attribute_db_id"))
+    @CollectionTable(name = "woo_product_attribute_options", joinColumns = @JoinColumn(name = "attribute_id"))
     @Column(name = "option_value")
     private List<String> options = new ArrayList<>();
 
@@ -37,19 +34,11 @@ public class ProductAttribute {
     public ProductAttribute() {
     }
 
-    public Long getDbId() {
-        return dbId;
-    }
-
-    public void setDbId(Long dbId) {
-        this.dbId = dbId;
-    }
-
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

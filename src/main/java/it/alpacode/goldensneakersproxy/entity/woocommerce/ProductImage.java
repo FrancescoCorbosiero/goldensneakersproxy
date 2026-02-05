@@ -11,10 +11,7 @@ public class ProductImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long dbId;
-
-    @Column(name = "image_id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "date_created")
     @JsonProperty("date_created")
@@ -48,19 +45,11 @@ public class ProductImage {
     public ProductImage() {
     }
 
-    public Long getDbId() {
-        return dbId;
-    }
-
-    public void setDbId(Long dbId) {
-        this.dbId = dbId;
-    }
-
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

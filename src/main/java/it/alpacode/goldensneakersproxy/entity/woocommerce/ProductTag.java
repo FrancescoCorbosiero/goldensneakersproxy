@@ -9,10 +9,7 @@ public class ProductTag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long dbId;
-
-    @Column(name = "tag_id")
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -26,19 +23,11 @@ public class ProductTag {
     public ProductTag() {
     }
 
-    public Long getDbId() {
-        return dbId;
-    }
-
-    public void setDbId(Long dbId) {
-        this.dbId = dbId;
-    }
-
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
