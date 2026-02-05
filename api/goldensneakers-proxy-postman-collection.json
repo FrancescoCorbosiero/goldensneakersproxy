@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "golden-sneakers-proxy-collection",
 		"name": "Golden Sneakers Proxy API",
-		"description": "API collection for Golden Sneakers Proxy service.\n\n## Endpoint Types\n\n- **/api/*** - Endpoints with business logic applied (47% price markup)\n- **/proxy/*** - Pure passthrough to Golden Sneakers API (original prices)\n\n## Authentication\n\nAll endpoints require Basic Authentication.",
+		"description": "API collection for Golden Sneakers Proxy service.\n\n## Endpoint Types\n\n- **/api/*** - Endpoints with business logic applied (47% price markup)\n- **/proxy/*** - Pure passthrough to Golden Sneakers API (original prices)\n- **/woo/*** - WooCommerce CRUD database module (local database)\n\n## Authentication\n\nAll endpoints require Basic Authentication.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"auth": {
@@ -841,6 +841,1091 @@
 			]
 		},
 		{
+			"name": "WooCommerce Database",
+			"description": "WooCommerce CRUD database module - local database storage for products and variations following WooCommerce REST API v3 schema",
+			"item": [
+				{
+					"name": "Products",
+					"description": "WooCommerce Product CRUD operations",
+					"item": [
+						{
+							"name": "Create Product",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Nike Air Max 90\",\n    \"slug\": \"nike-air-max-90\",\n    \"type\": \"variable\",\n    \"status\": \"publish\",\n    \"featured\": false,\n    \"catalog_visibility\": \"visible\",\n    \"description\": \"<p>Classic Nike Air Max 90 sneakers</p>\",\n    \"short_description\": \"Iconic Nike sneakers\",\n    \"sku\": \"NIKE-AM90-001\",\n    \"regular_price\": \"150.00\",\n    \"manage_stock\": true,\n    \"stock_quantity\": 100,\n    \"stock_status\": \"instock\",\n    \"categories\": [\n        {\"id\": 1, \"name\": \"Sneakers\", \"slug\": \"sneakers\"}\n    ],\n    \"tags\": [\n        {\"id\": 1, \"name\": \"Nike\", \"slug\": \"nike\"}\n    ],\n    \"images\": [\n        {\"src\": \"https://example.com/image.jpg\", \"name\": \"Main Image\", \"alt\": \"Nike Air Max 90\"}\n    ],\n    \"attributes\": [\n        {\n            \"name\": \"Size\",\n            \"position\": 0,\n            \"visible\": true,\n            \"variation\": true,\n            \"options\": [\"US 7\", \"US 8\", \"US 9\", \"US 10\"]\n        },\n        {\n            \"name\": \"Color\",\n            \"position\": 1,\n            \"visible\": true,\n            \"variation\": true,\n            \"options\": [\"White\", \"Black\", \"Red\"]\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/woo/products",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products"]
+								},
+								"description": "Create a new WooCommerce product"
+							}
+						},
+						{
+							"name": "List Products",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products"],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Page number (0-indexed)",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "20",
+											"description": "Page size",
+											"disabled": true
+										},
+										{
+											"key": "sortBy",
+											"value": "id",
+											"description": "Sort field",
+											"disabled": true
+										},
+										{
+											"key": "sortDir",
+											"value": "asc",
+											"description": "Sort direction (asc/desc)",
+											"disabled": true
+										}
+									]
+								},
+								"description": "List all products with optional pagination"
+							}
+						},
+						{
+							"name": "Get Product by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/:id",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Product ID"
+										}
+									]
+								},
+								"description": "Get a specific product by ID"
+							}
+						},
+						{
+							"name": "Get Product by SKU",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/sku/:sku",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", "sku", ":sku"],
+									"variable": [
+										{
+											"key": "sku",
+											"value": "NIKE-AM90-001",
+											"description": "Product SKU"
+										}
+									]
+								},
+								"description": "Get a product by its SKU"
+							}
+						},
+						{
+							"name": "Search Products",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/search?q=nike",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", "search"],
+									"query": [
+										{
+											"key": "q",
+											"value": "nike",
+											"description": "Search term (searches name, description, SKU)"
+										}
+									]
+								},
+								"description": "Search products by name, description, or SKU"
+							}
+						},
+						{
+							"name": "Get Products by Status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/status/:status",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", "status", ":status"],
+									"variable": [
+										{
+											"key": "status",
+											"value": "publish",
+											"description": "Product status (draft, pending, private, publish)"
+										}
+									]
+								},
+								"description": "Get products by status"
+							}
+						},
+						{
+							"name": "Get Products by Type",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/type/:type",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", "type", ":type"],
+									"variable": [
+										{
+											"key": "type",
+											"value": "variable",
+											"description": "Product type (simple, grouped, external, variable)"
+										}
+									]
+								},
+								"description": "Get products by type"
+							}
+						},
+						{
+							"name": "Get Products by Stock Status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/stock/:stockStatus",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", "stock", ":stockStatus"],
+									"variable": [
+										{
+											"key": "stockStatus",
+											"value": "instock",
+											"description": "Stock status (instock, outofstock, onbackorder)"
+										}
+									]
+								},
+								"description": "Get products by stock status"
+							}
+						},
+						{
+							"name": "Get Products by Category",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/category/:categoryId",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", "category", ":categoryId"],
+									"variable": [
+										{
+											"key": "categoryId",
+											"value": "1",
+											"description": "Category ID"
+										}
+									]
+								},
+								"description": "Get products by category ID"
+							}
+						},
+						{
+							"name": "Get Products by Tag",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/tag/:tagId",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", "tag", ":tagId"],
+									"variable": [
+										{
+											"key": "tagId",
+											"value": "1",
+											"description": "Tag ID"
+										}
+									]
+								},
+								"description": "Get products by tag ID"
+							}
+						},
+						{
+							"name": "Get Featured Products",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/featured",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", "featured"]
+								},
+								"description": "Get all featured products"
+							}
+						},
+						{
+							"name": "Get Products On Sale",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/on-sale",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", "on-sale"]
+								},
+								"description": "Get all products on sale"
+							}
+						},
+						{
+							"name": "Get Product Statistics",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/stats",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", "stats"]
+								},
+								"description": "Get product statistics (counts by status, type, etc.)"
+							}
+						},
+						{
+							"name": "Update Product (PUT)",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Nike Air Max 90 - Updated\",\n    \"status\": \"publish\",\n    \"regular_price\": \"160.00\",\n    \"sale_price\": \"140.00\",\n    \"stock_quantity\": 50\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/woo/products/:id",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Product ID"
+										}
+									]
+								},
+								"description": "Full update of a product (replaces all fields)"
+							}
+						},
+						{
+							"name": "Patch Product (PATCH)",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"stock_quantity\": 75,\n    \"status\": \"draft\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/woo/products/:id",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Product ID"
+										}
+									]
+								},
+								"description": "Partial update of a product (only specified fields)"
+							}
+						},
+						{
+							"name": "Delete Product",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/woo/products/:id",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Product ID"
+										}
+									]
+								},
+								"description": "Delete a product by ID"
+							}
+						},
+						{
+							"name": "Delete All Products",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/woo/products",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products"]
+								},
+								"description": "Delete all products (use with caution!)"
+							}
+						}
+					]
+				},
+				{
+					"name": "Variations (Standalone)",
+					"description": "Standalone variation endpoints (not product-scoped)",
+					"item": [
+						{
+							"name": "Create Variation",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"product_id\": 1,\n    \"sku\": \"NIKE-AM90-001-US9-WHITE\",\n    \"status\": \"publish\",\n    \"regular_price\": \"150.00\",\n    \"manage_stock\": true,\n    \"stock_quantity\": 25,\n    \"stock_status\": \"instock\",\n    \"weight\": \"0.5\",\n    \"dimensions\": {\n        \"length\": \"30\",\n        \"width\": \"20\",\n        \"height\": \"12\"\n    },\n    \"attributes\": [\n        {\"name\": \"Size\", \"option\": \"US 9\"},\n        {\"name\": \"Color\", \"option\": \"White\"}\n    ],\n    \"image\": {\n        \"src\": \"https://example.com/variation-image.jpg\",\n        \"name\": \"White US 9\",\n        \"alt\": \"Nike Air Max 90 White US 9\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/woo/variations",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "variations"]
+								},
+								"description": "Create a new variation (must include product_id)"
+							}
+						},
+						{
+							"name": "List Variations",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/variations",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "variations"],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Page number (0-indexed)",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "20",
+											"description": "Page size",
+											"disabled": true
+										},
+										{
+											"key": "sortBy",
+											"value": "id",
+											"description": "Sort field",
+											"disabled": true
+										},
+										{
+											"key": "sortDir",
+											"value": "asc",
+											"description": "Sort direction (asc/desc)",
+											"disabled": true
+										}
+									]
+								},
+								"description": "List all variations with optional pagination"
+							}
+						},
+						{
+							"name": "Get Variation by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/variations/:id",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "variations", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Variation ID"
+										}
+									]
+								},
+								"description": "Get a specific variation by ID"
+							}
+						},
+						{
+							"name": "Get Variation by SKU",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/variations/sku/:sku",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "variations", "sku", ":sku"],
+									"variable": [
+										{
+											"key": "sku",
+											"value": "NIKE-AM90-001-US9-WHITE",
+											"description": "Variation SKU"
+										}
+									]
+								},
+								"description": "Get a variation by its SKU"
+							}
+						},
+						{
+							"name": "Get Variations by Status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/variations/status/:status",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "variations", "status", ":status"],
+									"variable": [
+										{
+											"key": "status",
+											"value": "publish",
+											"description": "Variation status"
+										}
+									]
+								},
+								"description": "Get variations by status"
+							}
+						},
+						{
+							"name": "Get Variations by Stock Status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/variations/stock/:stockStatus",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "variations", "stock", ":stockStatus"],
+									"variable": [
+										{
+											"key": "stockStatus",
+											"value": "instock",
+											"description": "Stock status"
+										}
+									]
+								},
+								"description": "Get variations by stock status"
+							}
+						},
+						{
+							"name": "Get Variation Statistics",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/variations/stats",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "variations", "stats"]
+								},
+								"description": "Get variation statistics"
+							}
+						},
+						{
+							"name": "Update Variation (PUT)",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"product_id\": 1,\n    \"regular_price\": \"160.00\",\n    \"sale_price\": \"140.00\",\n    \"stock_quantity\": 20\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/woo/variations/:id",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "variations", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Variation ID"
+										}
+									]
+								},
+								"description": "Full update of a variation"
+							}
+						},
+						{
+							"name": "Patch Variation (PATCH)",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"stock_quantity\": 15,\n    \"stock_status\": \"onbackorder\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/woo/variations/:id",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "variations", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Variation ID"
+										}
+									]
+								},
+								"description": "Partial update of a variation"
+							}
+						},
+						{
+							"name": "Delete Variation",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/woo/variations/:id",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "variations", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Variation ID"
+										}
+									]
+								},
+								"description": "Delete a variation by ID"
+							}
+						},
+						{
+							"name": "Delete All Variations",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/woo/variations",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "variations"]
+								},
+								"description": "Delete all variations (use with caution!)"
+							}
+						}
+					]
+				},
+				{
+					"name": "Product Variations (Scoped)",
+					"description": "Product-scoped variation endpoints",
+					"item": [
+						{
+							"name": "Create Variation for Product",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"sku\": \"NIKE-AM90-001-US10-BLACK\",\n    \"status\": \"publish\",\n    \"regular_price\": \"150.00\",\n    \"manage_stock\": true,\n    \"stock_quantity\": 30,\n    \"stock_status\": \"instock\",\n    \"attributes\": [\n        {\"name\": \"Size\", \"option\": \"US 10\"},\n        {\"name\": \"Color\", \"option\": \"Black\"}\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/woo/products/:productId/variations",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":productId", "variations"],
+									"variable": [
+										{
+											"key": "productId",
+											"value": "1",
+											"description": "Parent product ID"
+										}
+									]
+								},
+								"description": "Create a new variation for a specific product"
+							}
+						},
+						{
+							"name": "List Variations for Product",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/:productId/variations",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":productId", "variations"],
+									"variable": [
+										{
+											"key": "productId",
+											"value": "1",
+											"description": "Parent product ID"
+										}
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "20",
+											"disabled": true
+										}
+									]
+								},
+								"description": "List all variations for a specific product"
+							}
+						},
+						{
+							"name": "Get Variation for Product",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/:productId/variations/:id",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":productId", "variations", ":id"],
+									"variable": [
+										{
+											"key": "productId",
+											"value": "1",
+											"description": "Parent product ID"
+										},
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Variation ID"
+										}
+									]
+								},
+								"description": "Get a specific variation for a product"
+							}
+						},
+						{
+							"name": "Get Variations by Status for Product",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/:productId/variations/status/:status",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":productId", "variations", "status", ":status"],
+									"variable": [
+										{
+											"key": "productId",
+											"value": "1",
+											"description": "Parent product ID"
+										},
+										{
+											"key": "status",
+											"value": "publish",
+											"description": "Variation status"
+										}
+									]
+								},
+								"description": "Get variations by status for a specific product"
+							}
+						},
+						{
+							"name": "Get Variations by Stock Status for Product",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/:productId/variations/stock/:stockStatus",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":productId", "variations", "stock", ":stockStatus"],
+									"variable": [
+										{
+											"key": "productId",
+											"value": "1",
+											"description": "Parent product ID"
+										},
+										{
+											"key": "stockStatus",
+											"value": "instock",
+											"description": "Stock status"
+										}
+									]
+								},
+								"description": "Get variations by stock status for a specific product"
+							}
+						},
+						{
+							"name": "Get Variation Count for Product",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/woo/products/:productId/variations/count",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":productId", "variations", "count"],
+									"variable": [
+										{
+											"key": "productId",
+											"value": "1",
+											"description": "Parent product ID"
+										}
+									]
+								},
+								"description": "Get variation count for a specific product"
+							}
+						},
+						{
+							"name": "Update Variation for Product (PUT)",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"regular_price\": \"165.00\",\n    \"stock_quantity\": 10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/woo/products/:productId/variations/:id",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":productId", "variations", ":id"],
+									"variable": [
+										{
+											"key": "productId",
+											"value": "1",
+											"description": "Parent product ID"
+										},
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Variation ID"
+										}
+									]
+								},
+								"description": "Full update of a variation for a product"
+							}
+						},
+						{
+							"name": "Patch Variation for Product (PATCH)",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"stock_quantity\": 5\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/woo/products/:productId/variations/:id",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":productId", "variations", ":id"],
+									"variable": [
+										{
+											"key": "productId",
+											"value": "1",
+											"description": "Parent product ID"
+										},
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Variation ID"
+										}
+									]
+								},
+								"description": "Partial update of a variation for a product"
+							}
+						},
+						{
+							"name": "Delete Variation for Product",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/woo/products/:productId/variations/:id",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":productId", "variations", ":id"],
+									"variable": [
+										{
+											"key": "productId",
+											"value": "1",
+											"description": "Parent product ID"
+										},
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Variation ID"
+										}
+									]
+								},
+								"description": "Delete a specific variation for a product"
+							}
+						},
+						{
+							"name": "Delete All Variations for Product",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/woo/products/:productId/variations",
+									"host": ["{{base_url}}"],
+									"path": ["woo", "products", ":productId", "variations"],
+									"variable": [
+										{
+											"key": "productId",
+											"value": "1",
+											"description": "Parent product ID"
+										}
+									]
+								},
+								"description": "Delete all variations for a specific product"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
 			"name": "Health Check",
 			"item": [
 				{
@@ -857,6 +1942,22 @@
 							"path": ["actuator", "health"]
 						},
 						"description": "Health check endpoint (no auth required)"
+					}
+				},
+				{
+					"name": "H2 Console",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/h2-console",
+							"host": ["{{base_url}}"],
+							"path": ["h2-console"]
+						},
+						"description": "H2 Database Console (development only, no auth required)"
 					}
 				}
 			]
