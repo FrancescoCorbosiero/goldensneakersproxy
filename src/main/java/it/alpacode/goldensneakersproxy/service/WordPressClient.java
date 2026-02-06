@@ -116,6 +116,51 @@ public class WordPressClient {
             .bodyToMono(String.class);
     }
 
+    // ========== WooCommerce REST API (List/Pull) ==========
+
+    /**
+     * List product categories from WooCommerce REST API (single page).
+     * GET /wp-json/wc/v3/products/categories?per_page={perPage}&page={page}
+     */
+    public Mono<String> listCategories(int page, int perPage) {
+        return listPage("/wp-json/wc/v3/products/categories", page, perPage);
+    }
+
+    /**
+     * List product tags (brands) from WooCommerce REST API (single page).
+     * GET /wp-json/wc/v3/products/tags?per_page={perPage}&page={page}
+     */
+    public Mono<String> listBrands(int page, int perPage) {
+        return listPage("/wp-json/wc/v3/products/tags", page, perPage);
+    }
+
+    /**
+     * List product attributes from WooCommerce REST API (single page).
+     * GET /wp-json/wc/v3/products/attributes?per_page={perPage}&page={page}
+     */
+    public Mono<String> listAttributes(int page, int perPage) {
+        return listPage("/wp-json/wc/v3/products/attributes", page, perPage);
+    }
+
+    private Mono<String> listPage(String path, int page, int perPage) {
+        String uri = config.getBaseUrl() + path + "?per_page=" + perPage + "&page=" + page;
+        logger.debug("GET {} (page {}, per_page {})", path, page, perPage);
+
+        return webClient.get()
+            .uri(uri)
+            .header(HttpHeaders.AUTHORIZATION, basicAuth())
+            .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+            .retrieve()
+            .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                response -> response.bodyToMono(String.class)
+                    .flatMap(body -> {
+                        logger.error("WordPress API error: {} - {}", response.statusCode(), body);
+                        return Mono.error(new WordPressApiException(body, response.statusCode().value()));
+                    })
+            )
+            .bodyToMono(String.class);
+    }
+
     // ========== WordPress REST API (Media) ==========
 
     /**

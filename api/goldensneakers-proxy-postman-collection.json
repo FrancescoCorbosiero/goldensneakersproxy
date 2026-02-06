@@ -57,8 +57,13 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/api/assortment?search=&ordering=",
-									"host": ["{{base_url}}"],
-									"path": ["api", "assortment"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"assortment"
+									],
 									"query": [
 										{
 											"key": "search",
@@ -117,8 +122,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/api/assortment/:id",
-									"host": ["{{base_url}}"],
-									"path": ["api", "assortment", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"assortment",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "id",
@@ -137,8 +148,14 @@
 								"header": [],
 								"url": {
 									"raw": "{{base_url}}/api/download/assortment.json",
-									"host": ["{{base_url}}"],
-									"path": ["api", "download", "assortment.json"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"download",
+										"assortment.json"
+									],
 									"query": [
 										{
 											"key": "search",
@@ -168,8 +185,13 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/api/assortment-flat?search=&ordering=",
-									"host": ["{{base_url}}"],
-									"path": ["api", "assortment-flat"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"assortment-flat"
+									],
 									"query": [
 										{
 											"key": "search",
@@ -228,8 +250,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/api/assortment-flat/:id",
-									"host": ["{{base_url}}"],
-									"path": ["api", "assortment-flat", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"assortment-flat",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "id",
@@ -248,8 +276,14 @@
 								"header": [],
 								"url": {
 									"raw": "{{base_url}}/api/download/assortment-flat.json",
-									"host": ["{{base_url}}"],
-									"path": ["api", "download", "assortment-flat.json"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"download",
+										"assortment-flat.json"
+									],
 									"query": [
 										{
 											"key": "search",
@@ -279,8 +313,13 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/api/assortment-size?size_id=",
-									"host": ["{{base_url}}"],
-									"path": ["api", "assortment-size"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"assortment-size"
+									],
 									"query": [
 										{
 											"key": "size_id",
@@ -339,8 +378,13 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/api/sku-search?q=nike&limit=10",
-									"host": ["{{base_url}}"],
-									"path": ["api", "sku-search"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"sku-search"
+									],
 									"query": [
 										{
 											"key": "q",
@@ -387,8 +431,14 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/api/orders-dropship/create-order",
-									"host": ["{{base_url}}"],
-									"path": ["api", "orders-dropship", "create-order"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"orders-dropship",
+										"create-order"
+									]
 								},
 								"description": "Create a dropship order with delivery address.\n\n**Item identification options:**\n- Use `size_id` for direct size identification\n- Use `sku` + `size_us` for product SKU + US size identification"
 							}
@@ -405,8 +455,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/api/orders-dropship/order-details/:orderId",
-									"host": ["{{base_url}}"],
-									"path": ["api", "orders-dropship", "order-details", ":orderId"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"orders-dropship",
+										"order-details",
+										":orderId"
+									],
 									"variable": [
 										{
 											"key": "orderId",
@@ -430,8 +487,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/api/orders-dropship/package-details/:packageId",
-									"host": ["{{base_url}}"],
-									"path": ["api", "orders-dropship", "package-details", ":packageId"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"orders-dropship",
+										"package-details",
+										":packageId"
+									],
 									"variable": [
 										{
 											"key": "packageId",
@@ -472,8 +536,15 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/api/orders-dropship/upload-shipping-label/:orderId",
-									"host": ["{{base_url}}"],
-									"path": ["api", "orders-dropship", "upload-shipping-label", ":orderId"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"orders-dropship",
+										"upload-shipping-label",
+										":orderId"
+									],
 									"variable": [
 										{
 											"key": "orderId",
@@ -508,8 +579,13 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/proxy/assortment?search=&ordering=",
-									"host": ["{{base_url}}"],
-									"path": ["proxy", "assortment"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"proxy",
+										"assortment"
+									],
 									"query": [
 										{
 											"key": "search",
@@ -538,8 +614,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/proxy/assortment/:id",
-									"host": ["{{base_url}}"],
-									"path": ["proxy", "assortment", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"proxy",
+										"assortment",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "id",
@@ -558,8 +640,14 @@
 								"header": [],
 								"url": {
 									"raw": "{{base_url}}/proxy/download/assortment.json",
-									"host": ["{{base_url}}"],
-									"path": ["proxy", "download", "assortment.json"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"proxy",
+										"download",
+										"assortment.json"
+									]
 								},
 								"description": "Download assortment as JSON file - original prices"
 							}
@@ -581,8 +669,13 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/proxy/assortment-flat?search=&ordering=",
-									"host": ["{{base_url}}"],
-									"path": ["proxy", "assortment-flat"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"proxy",
+										"assortment-flat"
+									],
 									"query": [
 										{
 											"key": "search",
@@ -611,8 +704,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/proxy/assortment-flat/:id",
-									"host": ["{{base_url}}"],
-									"path": ["proxy", "assortment-flat", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"proxy",
+										"assortment-flat",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "id",
@@ -631,8 +730,14 @@
 								"header": [],
 								"url": {
 									"raw": "{{base_url}}/proxy/download/assortment-flat.json",
-									"host": ["{{base_url}}"],
-									"path": ["proxy", "download", "assortment-flat.json"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"proxy",
+										"download",
+										"assortment-flat.json"
+									]
 								},
 								"description": "Download assortment flat as JSON file - original prices"
 							}
@@ -654,8 +759,13 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/proxy/assortment-size?size_id=",
-									"host": ["{{base_url}}"],
-									"path": ["proxy", "assortment-size"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"proxy",
+										"assortment-size"
+									],
 									"query": [
 										{
 											"key": "size_id",
@@ -690,8 +800,13 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/proxy/sku-search?q=nike&limit=10",
-									"host": ["{{base_url}}"],
-									"path": ["proxy", "sku-search"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"proxy",
+										"sku-search"
+									],
 									"query": [
 										{
 											"key": "q",
@@ -738,8 +853,14 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/proxy/orders-dropship/create-order",
-									"host": ["{{base_url}}"],
-									"path": ["proxy", "orders-dropship", "create-order"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"proxy",
+										"orders-dropship",
+										"create-order"
+									]
 								},
 								"description": "Create a dropship order (passthrough)"
 							}
@@ -756,8 +877,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/proxy/orders-dropship/order-details/:orderId",
-									"host": ["{{base_url}}"],
-									"path": ["proxy", "orders-dropship", "order-details", ":orderId"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"proxy",
+										"orders-dropship",
+										"order-details",
+										":orderId"
+									],
 									"variable": [
 										{
 											"key": "orderId",
@@ -781,8 +909,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/proxy/orders-dropship/package-details/:packageId",
-									"host": ["{{base_url}}"],
-									"path": ["proxy", "orders-dropship", "package-details", ":packageId"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"proxy",
+										"orders-dropship",
+										"package-details",
+										":packageId"
+									],
 									"variable": [
 										{
 											"key": "packageId",
@@ -823,8 +958,15 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/proxy/orders-dropship/upload-shipping-label/:orderId",
-									"host": ["{{base_url}}"],
-									"path": ["proxy", "orders-dropship", "upload-shipping-label", ":orderId"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"proxy",
+										"orders-dropship",
+										"upload-shipping-label",
+										":orderId"
+									],
 									"variable": [
 										{
 											"key": "orderId",
@@ -873,8 +1015,13 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/woo/products",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products"
+									]
 								},
 								"description": "Create a new WooCommerce product"
 							}
@@ -891,8 +1038,13 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products"
+									],
 									"query": [
 										{
 											"key": "page",
@@ -935,8 +1087,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/:id",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "id",
@@ -960,8 +1118,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/sku/:sku",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", "sku", ":sku"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										"sku",
+										":sku"
+									],
 									"variable": [
 										{
 											"key": "sku",
@@ -985,8 +1150,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/search?q=nike",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", "search"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										"search"
+									],
 									"query": [
 										{
 											"key": "q",
@@ -1010,8 +1181,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/status/:status",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", "status", ":status"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										"status",
+										":status"
+									],
 									"variable": [
 										{
 											"key": "status",
@@ -1035,8 +1213,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/type/:type",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", "type", ":type"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										"type",
+										":type"
+									],
 									"variable": [
 										{
 											"key": "type",
@@ -1060,8 +1245,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/stock/:stockStatus",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", "stock", ":stockStatus"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										"stock",
+										":stockStatus"
+									],
 									"variable": [
 										{
 											"key": "stockStatus",
@@ -1085,8 +1277,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/category/:categoryId",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", "category", ":categoryId"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										"category",
+										":categoryId"
+									],
 									"variable": [
 										{
 											"key": "categoryId",
@@ -1110,8 +1309,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/tag/:tagId",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", "tag", ":tagId"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										"tag",
+										":tagId"
+									],
 									"variable": [
 										{
 											"key": "tagId",
@@ -1135,8 +1341,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/featured",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", "featured"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										"featured"
+									]
 								},
 								"description": "Get all featured products"
 							}
@@ -1153,8 +1365,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/on-sale",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", "on-sale"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										"on-sale"
+									]
 								},
 								"description": "Get all products on sale"
 							}
@@ -1171,8 +1389,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/stats",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", "stats"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										"stats"
+									]
 								},
 								"description": "Get product statistics (counts by status, type, etc.)"
 							}
@@ -1202,8 +1426,14 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/woo/products/:id",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "id",
@@ -1240,8 +1470,14 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/woo/products/:id",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "id",
@@ -1260,8 +1496,14 @@
 								"header": [],
 								"url": {
 									"raw": "{{base_url}}/woo/products/:id",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "id",
@@ -1280,8 +1522,13 @@
 								"header": [],
 								"url": {
 									"raw": "{{base_url}}/woo/products",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products"
+									]
 								},
 								"description": "Delete all products (use with caution!)"
 							}
@@ -1317,8 +1564,13 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/woo/variations",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "variations"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"variations"
+									]
 								},
 								"description": "Create a new variation (must include product_id)"
 							}
@@ -1335,8 +1587,13 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/variations",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "variations"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"variations"
+									],
 									"query": [
 										{
 											"key": "page",
@@ -1379,8 +1636,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/variations/:id",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "variations", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"variations",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "id",
@@ -1404,8 +1667,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/variations/sku/:sku",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "variations", "sku", ":sku"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"variations",
+										"sku",
+										":sku"
+									],
 									"variable": [
 										{
 											"key": "sku",
@@ -1429,8 +1699,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/variations/status/:status",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "variations", "status", ":status"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"variations",
+										"status",
+										":status"
+									],
 									"variable": [
 										{
 											"key": "status",
@@ -1454,8 +1731,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/variations/stock/:stockStatus",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "variations", "stock", ":stockStatus"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"variations",
+										"stock",
+										":stockStatus"
+									],
 									"variable": [
 										{
 											"key": "stockStatus",
@@ -1479,8 +1763,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/variations/stats",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "variations", "stats"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"variations",
+										"stats"
+									]
 								},
 								"description": "Get variation statistics"
 							}
@@ -1510,8 +1800,14 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/woo/variations/:id",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "variations", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"variations",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "id",
@@ -1548,8 +1844,14 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/woo/variations/:id",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "variations", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"variations",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "id",
@@ -1568,8 +1870,14 @@
 								"header": [],
 								"url": {
 									"raw": "{{base_url}}/woo/variations/:id",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "variations", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"variations",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "id",
@@ -1588,8 +1896,13 @@
 								"header": [],
 								"url": {
 									"raw": "{{base_url}}/woo/variations",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "variations"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"variations"
+									]
 								},
 								"description": "Delete all variations (use with caution!)"
 							}
@@ -1625,8 +1938,15 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/woo/products/:productId/variations",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":productId", "variations"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":productId",
+										"variations"
+									],
 									"variable": [
 										{
 											"key": "productId",
@@ -1650,8 +1970,15 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/:productId/variations",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":productId", "variations"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":productId",
+										"variations"
+									],
 									"variable": [
 										{
 											"key": "productId",
@@ -1687,8 +2014,16 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/:productId/variations/:id",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":productId", "variations", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":productId",
+										"variations",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "productId",
@@ -1717,8 +2052,17 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/:productId/variations/status/:status",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":productId", "variations", "status", ":status"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":productId",
+										"variations",
+										"status",
+										":status"
+									],
 									"variable": [
 										{
 											"key": "productId",
@@ -1747,8 +2091,17 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/:productId/variations/stock/:stockStatus",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":productId", "variations", "stock", ":stockStatus"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":productId",
+										"variations",
+										"stock",
+										":stockStatus"
+									],
 									"variable": [
 										{
 											"key": "productId",
@@ -1777,8 +2130,16 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/woo/products/:productId/variations/count",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":productId", "variations", "count"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":productId",
+										"variations",
+										"count"
+									],
 									"variable": [
 										{
 											"key": "productId",
@@ -1815,8 +2176,16 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/woo/products/:productId/variations/:id",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":productId", "variations", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":productId",
+										"variations",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "productId",
@@ -1858,8 +2227,16 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/woo/products/:productId/variations/:id",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":productId", "variations", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":productId",
+										"variations",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "productId",
@@ -1883,8 +2260,16 @@
 								"header": [],
 								"url": {
 									"raw": "{{base_url}}/woo/products/:productId/variations/:id",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":productId", "variations", ":id"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":productId",
+										"variations",
+										":id"
+									],
 									"variable": [
 										{
 											"key": "productId",
@@ -1908,8 +2293,15 @@
 								"header": [],
 								"url": {
 									"raw": "{{base_url}}/woo/products/:productId/variations",
-									"host": ["{{base_url}}"],
-									"path": ["woo", "products", ":productId", "variations"],
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"woo",
+										"products",
+										":productId",
+										"variations"
+									],
 									"variable": [
 										{
 											"key": "productId",
@@ -1927,7 +2319,7 @@
 		},
 		{
 			"name": "WordPress Upload (Pre-Import)",
-			"description": "WordPress pre-import module. Uploads taxonomies (categories, brands, attributes) and media to WordPress, populating local lookup tables with real WordPress IDs. These IDs are then used when creating products via /woo/* endpoints.",
+			"description": "WordPress pre-import module. Uploads taxonomies (categories, brands, attributes) and media to WordPress, populating local lookup tables with real WordPress IDs. Also supports pulling existing taxonomies FROM WordPress into the local lookup tables (for manually-created WP resources). These IDs are then used when creating products via /woo/* endpoints.",
 			"item": [
 				{
 					"name": "Taxonomy Sync",
@@ -1944,10 +2336,40 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/wp-upload/taxonomies/sync",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "taxonomies", "sync"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"taxonomies",
+										"sync"
+									]
 								},
 								"description": "Upload all static taxonomies (categories, brands, attributes) from application config to WordPress in one call. Skips already-uploaded items."
+							}
+						},
+						{
+							"name": "Pull All Taxonomies from WordPress",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/taxonomies/pull",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"taxonomies",
+										"pull"
+									]
+								},
+								"description": "Pull all existing taxonomies (categories, brands/tags, attributes) FROM WordPress into the local lookup tables. Use this when you've manually set up taxonomies in the WordPress admin UI and need to import their IDs."
 							}
 						}
 					]
@@ -1980,8 +2402,13 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/wp-upload/categories",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "categories"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"categories"
+									]
 								},
 								"description": "Upload category names to WordPress. Returns WordPress IDs for each category. Skips categories already in lookup table."
 							}
@@ -1998,8 +2425,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/wp-upload/categories/from-config",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "categories", "from-config"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"categories",
+										"from-config"
+									]
 								},
 								"description": "Upload categories defined in application.properties (wordpress.categories) to WordPress."
 							}
@@ -2016,10 +2449,40 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/wp-upload/lookup/categories",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "lookup", "categories"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"lookup",
+										"categories"
+									]
 								},
 								"description": "Get all category name → WordPress ID mappings."
+							}
+						},
+						{
+							"name": "Pull Categories from WordPress",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/categories/pull",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"categories",
+										"pull"
+									]
+								},
+								"description": "Pull existing product categories FROM WordPress into the local lookup table. Upserts by name - updates existing entries, creates new ones."
 							}
 						}
 					]
@@ -2052,8 +2515,13 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/wp-upload/brands",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "brands"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"brands"
+									]
 								},
 								"description": "Upload brand names to WordPress (as product tags). Returns WordPress IDs. Skips brands already in lookup table."
 							}
@@ -2070,8 +2538,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/wp-upload/brands/from-config",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "brands", "from-config"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"brands",
+										"from-config"
+									]
 								},
 								"description": "Upload brands defined in application.properties (wordpress.brands) to WordPress."
 							}
@@ -2088,10 +2562,40 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/wp-upload/lookup/brands",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "lookup", "brands"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"lookup",
+										"brands"
+									]
 								},
 								"description": "Get all brand name → WordPress ID mappings."
+							}
+						},
+						{
+							"name": "Pull Brands from WordPress",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/brands/pull",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"brands",
+										"pull"
+									]
+								},
+								"description": "Pull existing product tags (brands) FROM WordPress into the local lookup table. Upserts by name - updates existing entries, creates new ones."
 							}
 						}
 					]
@@ -2124,8 +2628,13 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/wp-upload/attributes",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "attributes"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"attributes"
+									]
 								},
 								"description": "Upload product attribute names to WordPress. Returns WordPress IDs. Skips attributes already in lookup table."
 							}
@@ -2142,8 +2651,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/wp-upload/attributes/from-config",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "attributes", "from-config"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"attributes",
+										"from-config"
+									]
 								},
 								"description": "Upload attributes defined in application.properties (wordpress.attributes) to WordPress."
 							}
@@ -2160,10 +2675,40 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/wp-upload/lookup/attributes",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "lookup", "attributes"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"lookup",
+										"attributes"
+									]
 								},
 								"description": "Get all attribute name → WordPress ID mappings."
+							}
+						},
+						{
+							"name": "Pull Attributes from WordPress",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/attributes/pull",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"attributes",
+										"pull"
+									]
+								},
+								"description": "Pull existing product attributes FROM WordPress into the local lookup table. Upserts by name - updates existing entries, creates new ones."
 							}
 						}
 					]
@@ -2196,8 +2741,13 @@
 								},
 								"url": {
 									"raw": "{{base_url}}/wp-upload/media",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "media"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"media"
+									]
 								},
 								"description": "Upload images to WordPress media library. Downloads each image from the source URL and uploads it to WordPress. Returns WordPress media IDs and uploaded URLs. Skips images already in lookup table."
 							}
@@ -2214,8 +2764,14 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/wp-upload/lookup/media",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "lookup", "media"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"lookup",
+										"media"
+									]
 								},
 								"description": "Get all source URL → WordPress media ID mappings."
 							}
@@ -2237,8 +2793,13 @@
 								],
 								"url": {
 									"raw": "{{base_url}}/wp-upload/lookup",
-									"host": ["{{base_url}}"],
-									"path": ["wp-upload", "lookup"]
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"wp-upload",
+										"lookup"
+									]
 								},
 								"description": "Get all lookup tables (categories, brands, attributes, media) in a single response."
 							}
@@ -2263,8 +2824,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/assortment-sync/full",
-							"host": ["{{base_url}}"],
-							"path": ["assortment-sync", "full"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"assortment-sync",
+								"full"
+							]
 						},
 						"description": "Fetch entire GS assortment, map to WooCommerce products + variations, and upsert into local database.\n\nFor each product:\n- Resolves brand → tag ID (from wp-upload lookup)\n- Resolves category → category ID (from wp-upload lookup)\n- Resolves Size attribute → attribute ID (from wp-upload lookup)\n- Uploads product image to WordPress media (on-demand)\n- Creates variable product + size variations\n- Applies configured markup to offer_price"
 					}
@@ -2281,8 +2847,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/assortment-sync/product/:gsProductId",
-							"host": ["{{base_url}}"],
-							"path": ["assortment-sync", "product", ":gsProductId"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"assortment-sync",
+								"product",
+								":gsProductId"
+							],
 							"variable": [
 								{
 									"key": "gsProductId",
@@ -2306,8 +2878,13 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/assortment-sync/preview",
-							"host": ["{{base_url}}"],
-							"path": ["assortment-sync", "preview"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"assortment-sync",
+								"preview"
+							]
 						},
 						"description": "Preview the full assortment mapping without persisting. Returns the mapped WooCommerce products and variations."
 					}
@@ -2324,8 +2901,14 @@
 						],
 						"url": {
 							"raw": "{{base_url}}/assortment-sync/preview/:gsProductId",
-							"host": ["{{base_url}}"],
-							"path": ["assortment-sync", "preview", ":gsProductId"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"assortment-sync",
+								"preview",
+								":gsProductId"
+							],
 							"variable": [
 								{
 									"key": "gsProductId",
@@ -2352,8 +2935,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/actuator/health",
-							"host": ["{{base_url}}"],
-							"path": ["actuator", "health"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
 						},
 						"description": "Health check endpoint (no auth required)"
 					}
@@ -2368,8 +2956,12 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/h2-console",
-							"host": ["{{base_url}}"],
-							"path": ["h2-console"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"h2-console"
+							]
 						},
 						"description": "H2 Database Console (development only, no auth required)"
 					}
