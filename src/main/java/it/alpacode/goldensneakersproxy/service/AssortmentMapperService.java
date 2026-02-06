@@ -55,23 +55,32 @@ public class AssortmentMapperService {
     /**
      * Fetch the full GS assortment, map to WooCommerce products + variations,
      * and upsert into the local database.
+     * Validates that required taxonomy lookups exist before starting.
      */
     public SyncResult syncFullAssortment() {
         logger.info("Starting full assortment sync");
+
+        // Fail-fast: validate required taxonomies exist before processing anything
+        validateTaxonomyLookups();
 
         List<GsProduct> gsProducts = fetchAssortment();
         logger.info("Fetched {} products from Golden Sneakers", gsProducts.size());
 
         int created = 0;
         int updated = 0;
+        int skipped = 0;
         int failed = 0;
         List<String> errors = new ArrayList<>();
 
         for (GsProduct gsProduct : gsProducts) {
             try {
+                validateGsProduct(gsProduct);
                 SyncAction action = syncSingleProduct(gsProduct);
                 if (action == SyncAction.CREATED) created++;
                 else if (action == SyncAction.UPDATED) updated++;
+            } catch (ProductSkippedException e) {
+                skipped++;
+                logger.warn("Skipped product: {}", e.getMessage());
             } catch (Exception e) {
                 failed++;
                 String error = "Failed to sync product " + gsProduct.getSku() + ": " + e.getMessage();
@@ -80,10 +89,10 @@ public class AssortmentMapperService {
             }
         }
 
-        logger.info("Assortment sync complete: {} created, {} updated, {} failed",
-            created, updated, failed);
+        logger.info("Assortment sync complete: {} created, {} updated, {} skipped, {} failed",
+            created, updated, skipped, failed);
 
-        return new SyncResult(gsProducts.size(), created, updated, failed, errors);
+        return new SyncResult(gsProducts.size(), created, updated, skipped, failed, errors);
     }
 
     /**
@@ -92,6 +101,8 @@ public class AssortmentMapperService {
     public SyncResult syncProductById(Integer gsProductId) {
         logger.info("Syncing product with GS ID: {}", gsProductId);
 
+        validateTaxonomyLookups();
+
         String response = gsClient.fetchAssortmentById(String.valueOf(gsProductId), Map.of()).block();
         GsProduct gsProduct;
         try {
@@ -99,6 +110,8 @@ public class AssortmentMapperService {
         } catch (Exception e) {
             throw new AssortmentSyncException("Failed to parse GS product " + gsProductId, e);
         }
+
+        validateGsProduct(gsProduct);
 
         List<String> errors = new ArrayList<>();
         int created = 0;
@@ -113,7 +126,7 @@ public class AssortmentMapperService {
             logger.error("Failed to sync product {}: {}", gsProduct.getSku(), e.getMessage(), e);
         }
 
-        return new SyncResult(1, created, updated, errors.isEmpty() ? 0 : 1, errors);
+        return new SyncResult(1, created, updated, 0, errors.isEmpty() ? 0 : 1, errors);
     }
 
     // ========== PREVIEW (DRY RUN) ==========
@@ -145,6 +158,60 @@ public class AssortmentMapperService {
         return gsProducts.stream()
             .map(this::mapProductWithVariations)
             .collect(Collectors.toList());
+    }
+
+    // ========== VALIDATION ==========
+
+    /**
+     * Validate that required taxonomy lookups are populated.
+     * Fails fast before any product processing begins.
+     */
+    private void validateTaxonomyLookups() {
+        List<String> missing = new ArrayList<>();
+
+        if (wpUploadService.getCategoryByName(config.getDefaultCategory()).isEmpty()) {
+            missing.add("Category '" + config.getDefaultCategory() + "'");
+        }
+
+        if (wpUploadService.getAttributeByName(config.getSizeAttributeName()).isEmpty()) {
+            missing.add("Attribute '" + config.getSizeAttributeName() + "'");
+        }
+
+        if (!missing.isEmpty()) {
+            throw new AssortmentSyncException(
+                "Required taxonomy lookups not found: " + String.join(", ", missing)
+                    + ". Run POST /wp-upload/taxonomies/sync first.",
+                null);
+        }
+    }
+
+    /**
+     * Validate a GS product has the minimum required fields.
+     * Skips products without sizes (nothing to create variations from).
+     */
+    private void validateGsProduct(GsProduct gs) {
+        if (gs.getSku() == null || gs.getSku().isBlank()) {
+            throw new ProductSkippedException("Product with GS ID " + gs.getId() + " has no SKU");
+        }
+        if (gs.getName() == null || gs.getName().isBlank()) {
+            throw new ProductSkippedException("Product SKU " + gs.getSku() + " has no name");
+        }
+        if (gs.getSizes() == null || gs.getSizes().isEmpty()) {
+            throw new ProductSkippedException("Product SKU " + gs.getSku() + " has no sizes");
+        }
+
+        // Validate at least one size has a valid price
+        boolean hasPrice = gs.getSizes().stream()
+            .anyMatch(s -> s.getOfferPrice() != null && s.getOfferPrice().compareTo(BigDecimal.ZERO) > 0);
+        if (!hasPrice) {
+            throw new ProductSkippedException("Product SKU " + gs.getSku() + " has no valid prices");
+        }
+
+        // Validate brand exists in lookup (warn but don't skip - brand is not strictly required)
+        if (gs.getBrandName() != null && wpUploadService.getBrandByName(gs.getBrandName()).isEmpty()) {
+            logger.warn("Brand '{}' not found in lookup for product {}. Upload it via POST /wp-upload/brands first.",
+                gs.getBrandName(), gs.getSku());
+        }
     }
 
     // ========== INTERNAL SYNC LOGIC ==========
@@ -212,39 +279,42 @@ public class AssortmentMapperService {
         product.setName(gs.getName());
         product.setSku(gs.getSku());
         product.setSlug(slugify(gs.getName()));
-        product.setType("variable");
+        boolean hasSizes = gs.getSizes() != null && !gs.getSizes().isEmpty();
+        product.setType(hasSizes ? "variable" : "simple");
         product.setStatus("publish");
         product.setCatalogVisibility("visible");
         product.setFeatured(false);
 
         // Stock
         product.setManageStock(true);
-        int totalStock = gs.getSizes().stream()
-            .mapToInt(s -> s.getAvailableQuantity() != null ? s.getAvailableQuantity() : 0)
-            .sum();
+        int totalStock = hasSizes
+            ? gs.getSizes().stream()
+                .mapToInt(s -> s.getAvailableQuantity() != null ? s.getAvailableQuantity() : 0)
+                .sum()
+            : 0;
         product.setStockQuantity(totalStock);
         product.setStockStatus(totalStock > 0 ? "instock" : "outofstock");
 
-        // Price (min presented_price with markup across all sizes)
-        BigDecimal minPrice = gs.getSizes().stream()
-            .map(GsSize::getOfferPrice)
-            .filter(p -> p != null)
-            .min(BigDecimal::compareTo)
-            .orElse(BigDecimal.ZERO);
-        product.setRegularPrice(applyMarkup(minPrice).toPlainString());
-
-        // Category (resolve from lookup)
-        List<ProductCategory> categories = new ArrayList<>();
-        Optional<WpCategoryLookup> categoryLookup = wpUploadService.getCategoryByName(config.getDefaultCategory());
-        if (categoryLookup.isPresent()) {
-            ProductCategory cat = new ProductCategory();
-            cat.setId(categoryLookup.get().getWordpressId());
-            cat.setName(categoryLookup.get().getName());
-            cat.setSlug(categoryLookup.get().getSlug());
-            categories.add(cat);
-        } else {
-            logger.warn("Category '{}' not found in lookup table. Run wp-upload first.", config.getDefaultCategory());
+        // Price (min offer_price with markup across sizes that have a valid price)
+        if (hasSizes) {
+            BigDecimal minPrice = gs.getSizes().stream()
+                .map(GsSize::getOfferPrice)
+                .filter(p -> p != null && p.compareTo(BigDecimal.ZERO) > 0)
+                .min(BigDecimal::compareTo)
+                .orElse(null);
+            if (minPrice != null) {
+                product.setRegularPrice(applyMarkup(minPrice).toPlainString());
+            }
         }
+
+        // Category (resolve from lookup - guaranteed to exist by validateTaxonomyLookups)
+        List<ProductCategory> categories = new ArrayList<>();
+        WpCategoryLookup categoryLookup = wpUploadService.getCategoryByName(config.getDefaultCategory()).get();
+        ProductCategory cat = new ProductCategory();
+        cat.setId(categoryLookup.getWordpressId());
+        cat.setName(categoryLookup.getName());
+        cat.setSlug(categoryLookup.getSlug());
+        categories.add(cat);
         product.setCategories(categories);
 
         // Brand as tag (resolve from lookup)
@@ -257,8 +327,6 @@ public class AssortmentMapperService {
                 tag.setName(brandLookup.get().getName());
                 tag.setSlug(brandLookup.get().getSlug());
                 tags.add(tag);
-            } else {
-                logger.warn("Brand '{}' not found in lookup table. Run wp-upload first.", gs.getBrandName());
             }
         }
         product.setTags(tags);
@@ -266,7 +334,8 @@ public class AssortmentMapperService {
         // Image (upload on-demand, resolve from lookup)
         List<ProductImage> images = new ArrayList<>();
         if (gs.getImageFullUrl() != null && !gs.getImageFullUrl().isBlank()) {
-            WpMediaLookup mediaLookup = resolveMedia(gs.getImageFullUrl());
+            String imageUrl = normalizeImageUrl(gs.getImageFullUrl(), gs.getSku());
+            WpMediaLookup mediaLookup = resolveMedia(imageUrl);
             if (mediaLookup != null) {
                 ProductImage img = new ProductImage();
                 img.setId(mediaLookup.getWordpressId());
@@ -278,25 +347,23 @@ public class AssortmentMapperService {
         }
         product.setImages(images);
 
-        // Size attribute (resolve from lookup)
-        List<ProductAttribute> attributes = new ArrayList<>();
-        ProductAttribute sizeAttr = new ProductAttribute();
-        Optional<WpAttributeLookup> attrLookup = wpUploadService.getAttributeByName(config.getSizeAttributeName());
-        if (attrLookup.isPresent()) {
-            sizeAttr.setId(attrLookup.get().getWordpressId());
-        } else {
-            logger.warn("Attribute '{}' not found in lookup table. Run wp-upload first.", config.getSizeAttributeName());
+        // Size attribute (resolve from lookup - guaranteed to exist by validateTaxonomyLookups)
+        if (hasSizes) {
+            List<ProductAttribute> attributes = new ArrayList<>();
+            ProductAttribute sizeAttr = new ProductAttribute();
+            WpAttributeLookup attrLookup = wpUploadService.getAttributeByName(config.getSizeAttributeName()).get();
+            sizeAttr.setId(attrLookup.getWordpressId());
+            sizeAttr.setName(config.getSizeAttributeName());
+            sizeAttr.setPosition(0);
+            sizeAttr.setVisible(true);
+            sizeAttr.setVariation(true);
+            List<String> sizeOptions = gs.getSizes().stream()
+                .map(s -> formatSizeOption(s.getSizeEu(), s.getSizeUs()))
+                .collect(Collectors.toList());
+            sizeAttr.setOptions(sizeOptions);
+            attributes.add(sizeAttr);
+            product.setAttributes(attributes);
         }
-        sizeAttr.setName(config.getSizeAttributeName());
-        sizeAttr.setPosition(0);
-        sizeAttr.setVisible(true);
-        sizeAttr.setVariation(true);
-        List<String> sizeOptions = gs.getSizes().stream()
-            .map(s -> formatSizeOption(s.getSizeEu(), s.getSizeUs()))
-            .collect(Collectors.toList());
-        sizeAttr.setOptions(sizeOptions);
-        attributes.add(sizeAttr);
-        product.setAttributes(attributes);
 
         // Metadata (store GS source info)
         List<ProductMetaData> metaData = new ArrayList<>();
@@ -320,7 +387,7 @@ public class AssortmentMapperService {
         variation.setStatus("publish");
 
         // Price (offer_price with markup)
-        if (size.getOfferPrice() != null) {
+        if (size.getOfferPrice() != null && size.getOfferPrice().compareTo(BigDecimal.ZERO) > 0) {
             variation.setRegularPrice(applyMarkup(size.getOfferPrice()).toPlainString());
         }
 
@@ -335,13 +402,11 @@ public class AssortmentMapperService {
             variation.setGlobalUniqueId(size.getBarcode());
         }
 
-        // Size attribute
+        // Size attribute (guaranteed to exist by validateTaxonomyLookups)
         List<VariationAttribute> attributes = new ArrayList<>();
         VariationAttribute sizeAttr = new VariationAttribute();
-        Optional<WpAttributeLookup> attrLookup = wpUploadService.getAttributeByName(config.getSizeAttributeName());
-        if (attrLookup.isPresent()) {
-            sizeAttr.setId(attrLookup.get().getWordpressId());
-        }
+        WpAttributeLookup attrLookup = wpUploadService.getAttributeByName(config.getSizeAttributeName()).get();
+        sizeAttr.setId(attrLookup.getWordpressId());
         sizeAttr.setName(config.getSizeAttributeName());
         sizeAttr.setOption(formatSizeOption(size.getSizeEu(), size.getSizeUs()));
         attributes.add(sizeAttr);
@@ -372,6 +437,19 @@ public class AssortmentMapperService {
         }
     }
 
+    /**
+     * Normalize GS image URL. The GS API returns directory-like URLs ending with /main/.
+     * We append a filename derived from the SKU to form a downloadable image URL.
+     */
+    private String normalizeImageUrl(String imageFullUrl, String sku) {
+        // GS URLs look like: https://www.goldensneakers.net/images/DD1873-102/main/
+        // If URL ends with /, it's a directory path - append SKU-based filename
+        if (imageFullUrl.endsWith("/")) {
+            return imageFullUrl + sku + ".jpg";
+        }
+        return imageFullUrl;
+    }
+
     private WpMediaLookup resolveMedia(String imageUrl) {
         Optional<WpMediaLookup> existing = wpUploadService.getMediaBySourceUrl(imageUrl);
         if (existing.isPresent()) {
@@ -385,7 +463,7 @@ public class AssortmentMapperService {
                 return uploaded.get(0);
             }
         } catch (Exception e) {
-            logger.error("Failed to upload media '{}': {}", imageUrl, e.getMessage());
+            logger.error("Failed to upload media '{}': {}. Product will be created without image.", imageUrl, e.getMessage());
         }
         return null;
     }
@@ -438,6 +516,7 @@ public class AssortmentMapperService {
         int totalProcessed,
         int created,
         int updated,
+        int skipped,
         int failed,
         List<String> errors
     ) {}
@@ -451,11 +530,17 @@ public class AssortmentMapperService {
         CREATED, UPDATED
     }
 
-    // ========== EXCEPTION ==========
+    // ========== EXCEPTIONS ==========
 
     public static class AssortmentSyncException extends RuntimeException {
         public AssortmentSyncException(String message, Throwable cause) {
             super(message, cause);
+        }
+    }
+
+    public static class ProductSkippedException extends RuntimeException {
+        public ProductSkippedException(String message) {
+            super(message);
         }
     }
 }
