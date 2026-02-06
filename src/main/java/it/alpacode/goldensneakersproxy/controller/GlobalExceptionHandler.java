@@ -1,5 +1,6 @@
 package it.alpacode.goldensneakersproxy.controller;
 
+import it.alpacode.goldensneakersproxy.service.AssortmentMapperService;
 import it.alpacode.goldensneakersproxy.service.GoldenSneakersClient;
 import it.alpacode.goldensneakersproxy.service.WordPressClient;
 import it.alpacode.goldensneakersproxy.service.WordPressUploadService;
@@ -93,6 +94,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
             .contentType(MediaType.APPLICATION_JSON)
             .body(new ErrorResponse("wordpress_error", message));
+    }
+
+    @ExceptionHandler(AssortmentMapperService.AssortmentSyncException.class)
+    public ResponseEntity<ErrorResponse> handleAssortmentSyncException(
+            AssortmentMapperService.AssortmentSyncException ex) {
+        logger.error("Assortment sync error: {}", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponse("assortment_sync_error", ex.getMessage()));
     }
 
     @ExceptionHandler(WordPressUploadService.WordPressUploadException.class)

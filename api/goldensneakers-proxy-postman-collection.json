@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "golden-sneakers-proxy-collection",
 		"name": "Golden Sneakers Proxy API",
-		"description": "API collection for Golden Sneakers Proxy service.\n\n## Endpoint Types\n\n- **/api/*** - Endpoints with business logic applied (47% price markup)\n- **/proxy/*** - Pure passthrough to Golden Sneakers API (original prices)\n- **/woo/*** - WooCommerce CRUD database module (local database)\n- **/wp-upload/*** - WordPress pre-import module (upload taxonomies and media)\n\n## Authentication\n\nAll endpoints require Basic Authentication (except /proxy/* which is public).",
+		"description": "API collection for Golden Sneakers Proxy service.\n\n## Endpoint Types\n\n- **/api/*** - Endpoints with business logic applied (47% price markup)\n- **/proxy/*** - Pure passthrough to Golden Sneakers API (original prices)\n- **/woo/*** - WooCommerce CRUD database module (local database)\n- **/wp-upload/*** - WordPress pre-import module (upload taxonomies and media)\n- **/assortment-sync/*** - Assortment mapper (GS feed → WooCommerce products)\n\n## Authentication\n\nAll endpoints require Basic Authentication (except /proxy/* which is public).",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"auth": {
@@ -2244,6 +2244,98 @@
 							}
 						}
 					]
+				}
+			]
+		},
+		{
+			"name": "Assortment Sync (GS → Woo Mapper)",
+			"description": "Maps Golden Sneakers assortment feed into WooCommerce product/variation structure. Resolves taxonomy IDs from lookup tables and uploads images to WordPress on-demand.",
+			"item": [
+				{
+					"name": "Sync Full Assortment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/assortment-sync/full",
+							"host": ["{{base_url}}"],
+							"path": ["assortment-sync", "full"]
+						},
+						"description": "Fetch entire GS assortment, map to WooCommerce products + variations, and upsert into local database.\n\nFor each product:\n- Resolves brand → tag ID (from wp-upload lookup)\n- Resolves category → category ID (from wp-upload lookup)\n- Resolves Size attribute → attribute ID (from wp-upload lookup)\n- Uploads product image to WordPress media (on-demand)\n- Creates variable product + size variations\n- Applies configured markup to offer_price"
+					}
+				},
+				{
+					"name": "Sync Single Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/assortment-sync/product/:gsProductId",
+							"host": ["{{base_url}}"],
+							"path": ["assortment-sync", "product", ":gsProductId"],
+							"variable": [
+								{
+									"key": "gsProductId",
+									"value": "8",
+									"description": "Golden Sneakers product ID"
+								}
+							]
+						},
+						"description": "Sync a single product by its Golden Sneakers product ID."
+					}
+				},
+				{
+					"name": "Preview Full Assortment (dry run)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/assortment-sync/preview",
+							"host": ["{{base_url}}"],
+							"path": ["assortment-sync", "preview"]
+						},
+						"description": "Preview the full assortment mapping without persisting. Returns the mapped WooCommerce products and variations."
+					}
+				},
+				{
+					"name": "Preview Single Product (dry run)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/assortment-sync/preview/:gsProductId",
+							"host": ["{{base_url}}"],
+							"path": ["assortment-sync", "preview", ":gsProductId"],
+							"variable": [
+								{
+									"key": "gsProductId",
+									"value": "8",
+									"description": "Golden Sneakers product ID"
+								}
+							]
+						},
+						"description": "Preview mapping of a single product without persisting."
+					}
 				}
 			]
 		},
