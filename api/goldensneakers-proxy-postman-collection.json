@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "golden-sneakers-proxy-collection",
 		"name": "Golden Sneakers Proxy API",
-		"description": "API collection for Golden Sneakers Proxy service.\n\n## Endpoint Types\n\n- **/api/*** - Endpoints with business logic applied (47% price markup)\n- **/proxy/*** - Pure passthrough to Golden Sneakers API (original prices)\n- **/woo/*** - WooCommerce CRUD database module (local database)\n\n## Authentication\n\nAll endpoints require Basic Authentication.",
+		"description": "API collection for Golden Sneakers Proxy service.\n\n## Endpoint Types\n\n- **/api/*** - Endpoints with business logic applied (47% price markup)\n- **/proxy/*** - Pure passthrough to Golden Sneakers API (original prices)\n- **/woo/*** - WooCommerce CRUD database module (local database)\n- **/wp-upload/*** - WordPress pre-import module (upload taxonomies and media)\n\n## Authentication\n\nAll endpoints require Basic Authentication (except /proxy/* which is public).",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"auth": {
@@ -1919,6 +1919,328 @@
 									]
 								},
 								"description": "Delete all variations for a specific product"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "WordPress Upload (Pre-Import)",
+			"description": "WordPress pre-import module. Uploads taxonomies (categories, brands, attributes) and media to WordPress, populating local lookup tables with real WordPress IDs. These IDs are then used when creating products via /woo/* endpoints.",
+			"item": [
+				{
+					"name": "Taxonomy Sync",
+					"item": [
+						{
+							"name": "Sync All Taxonomies from Config",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/taxonomies/sync",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "taxonomies", "sync"]
+								},
+								"description": "Upload all static taxonomies (categories, brands, attributes) from application config to WordPress in one call. Skips already-uploaded items."
+							}
+						}
+					]
+				},
+				{
+					"name": "Categories",
+					"item": [
+						{
+							"name": "Upload Categories",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\"Sneakers\", \"Running\", \"Basketball\", \"Lifestyle\"]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/wp-upload/categories",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "categories"]
+								},
+								"description": "Upload category names to WordPress. Returns WordPress IDs for each category. Skips categories already in lookup table."
+							}
+						},
+						{
+							"name": "Upload Categories from Config",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/categories/from-config",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "categories", "from-config"]
+								},
+								"description": "Upload categories defined in application.properties (wordpress.categories) to WordPress."
+							}
+						},
+						{
+							"name": "Get Category Lookup",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/lookup/categories",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "lookup", "categories"]
+								},
+								"description": "Get all category name → WordPress ID mappings."
+							}
+						}
+					]
+				},
+				{
+					"name": "Brands",
+					"item": [
+						{
+							"name": "Upload Brands",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\"Nike\", \"Adidas\", \"New Balance\", \"Puma\", \"Converse\"]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/wp-upload/brands",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "brands"]
+								},
+								"description": "Upload brand names to WordPress (as product tags). Returns WordPress IDs. Skips brands already in lookup table."
+							}
+						},
+						{
+							"name": "Upload Brands from Config",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/brands/from-config",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "brands", "from-config"]
+								},
+								"description": "Upload brands defined in application.properties (wordpress.brands) to WordPress."
+							}
+						},
+						{
+							"name": "Get Brand Lookup",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/lookup/brands",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "lookup", "brands"]
+								},
+								"description": "Get all brand name → WordPress ID mappings."
+							}
+						}
+					]
+				},
+				{
+					"name": "Attributes",
+					"item": [
+						{
+							"name": "Upload Attributes",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\"Color\", \"Size\"]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/wp-upload/attributes",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "attributes"]
+								},
+								"description": "Upload product attribute names to WordPress. Returns WordPress IDs. Skips attributes already in lookup table."
+							}
+						},
+						{
+							"name": "Upload Attributes from Config",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/attributes/from-config",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "attributes", "from-config"]
+								},
+								"description": "Upload attributes defined in application.properties (wordpress.attributes) to WordPress."
+							}
+						},
+						{
+							"name": "Get Attribute Lookup",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/lookup/attributes",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "lookup", "attributes"]
+								},
+								"description": "Get all attribute name → WordPress ID mappings."
+							}
+						}
+					]
+				},
+				{
+					"name": "Media",
+					"item": [
+						{
+							"name": "Upload Media (Images)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n    \"https://example.com/images/nike-air-max-90.jpg\",\n    \"https://example.com/images/adidas-ultraboost.png\"\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/wp-upload/media",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "media"]
+								},
+								"description": "Upload images to WordPress media library. Downloads each image from the source URL and uploads it to WordPress. Returns WordPress media IDs and uploaded URLs. Skips images already in lookup table."
+							}
+						},
+						{
+							"name": "Get Media Lookup",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/lookup/media",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "lookup", "media"]
+								},
+								"description": "Get all source URL → WordPress media ID mappings."
+							}
+						}
+					]
+				},
+				{
+					"name": "Lookup",
+					"item": [
+						{
+							"name": "Get All Lookups",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/wp-upload/lookup",
+									"host": ["{{base_url}}"],
+									"path": ["wp-upload", "lookup"]
+								},
+								"description": "Get all lookup tables (categories, brands, attributes, media) in a single response."
 							}
 						}
 					]
