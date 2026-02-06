@@ -281,6 +281,173 @@ public class WordPressUploadService {
         return new TaxonomySyncResult(categories, brands, attributes);
     }
 
+    // ========== PULL FROM WORDPRESS ==========
+
+    /**
+     * Pull all taxonomies from WordPress into local lookup tables.
+     * Fetches existing categories, brands (tags), and attributes from WP
+     * and upserts them into the local DB.
+     */
+    public TaxonomyPullResult pullAllTaxonomiesFromWordPress() {
+        logger.info("Starting full taxonomy pull from WordPress");
+
+        List<WpCategoryLookup> categories = pullCategoriesFromWordPress();
+        List<WpBrandLookup> brands = pullBrandsFromWordPress();
+        List<WpAttributeLookup> attributes = pullAttributesFromWordPress();
+
+        logger.info("Taxonomy pull complete: {} categories, {} brands, {} attributes",
+            categories.size(), brands.size(), attributes.size());
+
+        return new TaxonomyPullResult(categories, brands, attributes);
+    }
+
+    /**
+     * Pull all product categories from WordPress into the local lookup table.
+     * Fetches all pages, upserts each category by name.
+     */
+    public List<WpCategoryLookup> pullCategoriesFromWordPress() {
+        logger.info("Pulling categories from WordPress");
+        List<WpCategoryLookup> results = new ArrayList<>();
+
+        for (JsonNode item : fetchAllPages((page, perPage) -> wordPressClient.listCategories(page, perPage))) {
+            String name = item.get("name").asText();
+            Integer wpId = item.get("id").asInt();
+            String slug = item.has("slug") ? item.get("slug").asText() : null;
+
+            // Skip "Uncategorized" default category
+            if ("Uncategorized".equalsIgnoreCase(name) || "uncategorized".equals(slug)) {
+                logger.debug("Skipping default 'Uncategorized' category");
+                continue;
+            }
+
+            WpCategoryLookup lookup = categoryLookupRepository.findByName(name)
+                .map(existing -> {
+                    existing.setWordpressId(wpId);
+                    existing.setSlug(slug);
+                    logger.debug("Updated category '{}' -> WordPress ID: {}", name, wpId);
+                    return existing;
+                })
+                .orElseGet(() -> {
+                    logger.info("Imported category '{}' -> WordPress ID: {}", name, wpId);
+                    return new WpCategoryLookup(name, slug, wpId);
+                });
+
+            results.add(categoryLookupRepository.save(lookup));
+        }
+
+        logger.info("Pulled {} categories from WordPress", results.size());
+        return results;
+    }
+
+    /**
+     * Pull all product tags (brands) from WordPress into the local lookup table.
+     * Fetches all pages, upserts each brand by name.
+     */
+    public List<WpBrandLookup> pullBrandsFromWordPress() {
+        logger.info("Pulling brands (tags) from WordPress");
+        List<WpBrandLookup> results = new ArrayList<>();
+
+        for (JsonNode item : fetchAllPages((page, perPage) -> wordPressClient.listBrands(page, perPage))) {
+            String name = item.get("name").asText();
+            Integer wpId = item.get("id").asInt();
+            String slug = item.has("slug") ? item.get("slug").asText() : null;
+
+            WpBrandLookup lookup = brandLookupRepository.findByName(name)
+                .map(existing -> {
+                    existing.setWordpressId(wpId);
+                    existing.setSlug(slug);
+                    logger.debug("Updated brand '{}' -> WordPress ID: {}", name, wpId);
+                    return existing;
+                })
+                .orElseGet(() -> {
+                    logger.info("Imported brand '{}' -> WordPress ID: {}", name, wpId);
+                    return new WpBrandLookup(name, slug, wpId);
+                });
+
+            results.add(brandLookupRepository.save(lookup));
+        }
+
+        logger.info("Pulled {} brands from WordPress", results.size());
+        return results;
+    }
+
+    /**
+     * Pull all product attributes from WordPress into the local lookup table.
+     * Fetches all pages, upserts each attribute by name.
+     */
+    public List<WpAttributeLookup> pullAttributesFromWordPress() {
+        logger.info("Pulling attributes from WordPress");
+        List<WpAttributeLookup> results = new ArrayList<>();
+
+        for (JsonNode item : fetchAllPages((page, perPage) -> wordPressClient.listAttributes(page, perPage))) {
+            String name = item.get("name").asText();
+            Integer wpId = item.get("id").asInt();
+            String slug = item.has("slug") ? item.get("slug").asText() : null;
+
+            WpAttributeLookup lookup = attributeLookupRepository.findByName(name)
+                .map(existing -> {
+                    existing.setWordpressId(wpId);
+                    existing.setSlug(slug);
+                    logger.debug("Updated attribute '{}' -> WordPress ID: {}", name, wpId);
+                    return existing;
+                })
+                .orElseGet(() -> {
+                    logger.info("Imported attribute '{}' -> WordPress ID: {}", name, wpId);
+                    return new WpAttributeLookup(name, slug, wpId);
+                });
+
+            results.add(attributeLookupRepository.save(lookup));
+        }
+
+        logger.info("Pulled {} attributes from WordPress", results.size());
+        return results;
+    }
+
+    /**
+     * Fetch all pages from a paginated WooCommerce REST API endpoint.
+     * Returns a flat list of all JSON nodes across all pages.
+     */
+    private List<JsonNode> fetchAllPages(PaginatedFetcher fetcher) {
+        List<JsonNode> allItems = new ArrayList<>();
+        int page = 1;
+        int perPage = 100;
+
+        while (true) {
+            try {
+                String response = fetcher.fetch(page, perPage).block();
+                if (response == null) {
+                    break;
+                }
+
+                JsonNode array = objectMapper.readTree(response);
+                if (!array.isArray() || array.isEmpty()) {
+                    break;
+                }
+
+                for (JsonNode item : array) {
+                    allItems.add(item);
+                }
+
+                // If fewer items than perPage, we've reached the last page
+                if (array.size() < perPage) {
+                    break;
+                }
+
+                page++;
+            } catch (JsonProcessingException e) {
+                logger.error("Failed to parse WordPress response on page {}: {}", page, e.getMessage());
+                throw new WordPressUploadException("Failed to parse WordPress API response", e);
+            }
+        }
+
+        return allItems;
+    }
+
+    @FunctionalInterface
+    private interface PaginatedFetcher {
+        reactor.core.publisher.Mono<String> fetch(int page, int perPage);
+    }
+
     // ========== LOOKUP QUERIES ==========
 
     @Transactional(readOnly = true)
@@ -351,6 +518,12 @@ public class WordPressUploadService {
     // ========== RESULT TYPES ==========
 
     public record TaxonomySyncResult(
+        List<WpCategoryLookup> categories,
+        List<WpBrandLookup> brands,
+        List<WpAttributeLookup> attributes
+    ) {}
+
+    public record TaxonomyPullResult(
         List<WpCategoryLookup> categories,
         List<WpBrandLookup> brands,
         List<WpAttributeLookup> attributes

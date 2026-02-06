@@ -47,6 +47,50 @@ public class WordPressUploadController {
         return ResponseEntity.ok(result);
     }
 
+    // ========== PULL TAXONOMIES FROM WORDPRESS ==========
+
+    /**
+     * POST /wp-upload/taxonomies/pull - Pull all existing taxonomies from WordPress
+     * into the local lookup tables. Fetches categories, brands (tags), and attributes
+     * that were manually created in WordPress UI.
+     */
+    @PostMapping(value = "/taxonomies/pull", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WordPressUploadService.TaxonomyPullResult> pullTaxonomiesFromWordPress() {
+        logger.info("POST /wp-upload/taxonomies/pull - Pulling all taxonomies from WordPress");
+        WordPressUploadService.TaxonomyPullResult result = uploadService.pullAllTaxonomiesFromWordPress();
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * POST /wp-upload/categories/pull - Pull existing categories from WordPress.
+     */
+    @PostMapping(value = "/categories/pull", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<WpCategoryLookup>> pullCategoriesFromWordPress() {
+        logger.info("POST /wp-upload/categories/pull - Pulling categories from WordPress");
+        List<WpCategoryLookup> results = uploadService.pullCategoriesFromWordPress();
+        return ResponseEntity.ok(results);
+    }
+
+    /**
+     * POST /wp-upload/brands/pull - Pull existing brands (tags) from WordPress.
+     */
+    @PostMapping(value = "/brands/pull", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<WpBrandLookup>> pullBrandsFromWordPress() {
+        logger.info("POST /wp-upload/brands/pull - Pulling brands from WordPress");
+        List<WpBrandLookup> results = uploadService.pullBrandsFromWordPress();
+        return ResponseEntity.ok(results);
+    }
+
+    /**
+     * POST /wp-upload/attributes/pull - Pull existing attributes from WordPress.
+     */
+    @PostMapping(value = "/attributes/pull", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<WpAttributeLookup>> pullAttributesFromWordPress() {
+        logger.info("POST /wp-upload/attributes/pull - Pulling attributes from WordPress");
+        List<WpAttributeLookup> results = uploadService.pullAttributesFromWordPress();
+        return ResponseEntity.ok(results);
+    }
+
     // ========== UPLOAD CATEGORIES ==========
 
     /**
